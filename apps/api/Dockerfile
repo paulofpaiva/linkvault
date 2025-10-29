@@ -1,5 +1,6 @@
 FROM node:20-alpine
 
+# habilita pnpm
 RUN corepack enable
 
 WORKDIR /app
@@ -14,11 +15,11 @@ RUN pnpm -r install --frozen-lockfile
 
 COPY . .
 
+RUN pnpm -r build
+
 WORKDIR /app/apps/api
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD sh -c "node --import=tsx src/db/migrate.ts && node --import=tsx src/index.ts"
-
-
+CMD ["node", "dist/index.js"]
