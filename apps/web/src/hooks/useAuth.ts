@@ -27,7 +27,6 @@ export const useLogin = () => {
       if (response.isSuccess && response.data) {
         const { accessToken, user } = response.data;
         setAuth(user, accessToken);
-        toast.success(response.message || 'Login successful!');
         navigate('/home');
       }
     },
@@ -76,7 +75,6 @@ export const useLogout = () => {
     },
     onSuccess: () => {
       logout();
-      toast.success('Logout successful!');
       navigate('/');
     },
     onError: (error: any) => {
