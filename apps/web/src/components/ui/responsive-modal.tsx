@@ -25,8 +25,7 @@ export function ResponsiveModal({
   className = "",
   actionButton,
   onCancel,
-  cancelText = "Cancel",
-  actionText = "Save"
+  cancelText = "Cancel"
 }: ResponsiveModalProps) {
   const isMobile = useIsMobile()
 
