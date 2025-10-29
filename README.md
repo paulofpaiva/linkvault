@@ -57,5 +57,4 @@ See `apps/api/env.example` for required variables:
 - `DATABASE_URL` – PostgreSQL connection string
 - `JWT_SECRET` – Access token secret
 - `JWT_REFRESH_SECRET` – Refresh token secret
-- `FRONTEND_URL` – Allowed CORS origin (e.g., http://localhost:5173)
 - `PORT` – API port (default: 3000)

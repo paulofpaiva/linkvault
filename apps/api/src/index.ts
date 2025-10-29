@@ -13,12 +13,12 @@ import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const rawOrigins = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 
 app.use(helmet())
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:5173',
+app.use(cors({  
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());

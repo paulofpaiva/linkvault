@@ -1,43 +1,52 @@
 services:
-  db:
+  postgres:
     image: postgres:16-alpine
-    container_name: linkvault-db
+    container_name: linkvault_postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: linkvault
+      POSTGRES_USER: linkvault
+      POSTGRES_PASSWORD: linkvault
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U linkvault -d linkvault"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
-    container_name: linkvault-api
-    env_file:
-    - ./apps/api/.env
-    depends_on:
-      db:
-        condition: service_healthy
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: linkvault_api
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      PORT: ${PORT:-3000}
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://linkvault:linkvault@postgres:5432/linkvault
+      CORS_ORIGIN: http://localhost:5173
+      JWT_SECRET: change-me-dev
+      JWT_REFRESH_SECRET: change-me-dev-refresh
     ports:
-      - "${PORT:-3000}:3000"
-    restart: unless-stopped
-    volumes:
-      - ./apps/api/src:/app/src
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000
+    container_name: linkvault_web
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
+
 

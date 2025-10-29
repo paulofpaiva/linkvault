@@ -111,7 +111,7 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     if (body.categoryIds && body.categoryIds.length > 0) {
       await db.insert(linkCategories).values(
-        body.categoryIds.map((categoryId) => ({
+        body.categoryIds.map((categoryId: string) => ({
           linkId: newLink.id,
           categoryId,
         }))
@@ -187,7 +187,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
       if (body.categoryIds.length > 0) {
         await db.insert(linkCategories).values(
-          body.categoryIds.map((categoryId) => ({
+          body.categoryIds.map((categoryId: string) => ({
             linkId,
             categoryId,
           }))

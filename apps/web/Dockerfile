@@ -8,17 +8,20 @@ COPY pnpm-workspace.yaml pnpm-workspace.yaml
 COPY pnpm-lock.yaml pnpm-lock.yaml
 COPY package.json package.json
 COPY packages/shared/package.json packages/shared/package.json
-COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
 
 RUN pnpm -r install --frozen-lockfile
 
 COPY . .
 
-WORKDIR /app/apps/api
+ARG VITE_API_URL=http://localhost:3000
+ENV VITE_API_URL=$VITE_API_URL
 
-ENV NODE_ENV=production
-EXPOSE 3000
+RUN pnpm --filter web build
 
-CMD sh -c "node --import=tsx src/db/migrate.ts && node --import=tsx src/index.ts"
+WORKDIR /app/apps/web
+EXPOSE 5173
+
+CMD ["pnpm", "preview"]
 
 
