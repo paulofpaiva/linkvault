@@ -14,11 +14,13 @@ RUN pnpm -r install --frozen-lockfile
 
 COPY . .
 
+RUN pnpm --filter api build
+
 WORKDIR /app/apps/api
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD sh -c "node --import=tsx src/db/migrate.ts && node --import=tsx src/index.ts"
+CMD sh -c "node dist/db/migrate.js && node dist/index.js"
 
 
