@@ -7,7 +7,7 @@ import { AppError } from '../middleware/errorHandler.middleware.js';
 import { AuthRequest, requireAuth } from '../middleware/auth.middleware.js';
 import { createLinkSchema, updateLinkSchema, linkStatusSchema } from '@linkvault/shared';
 
-const router = Router();
+const router: import('express').Router = Router();
 
 router.use(requireAuth);
 

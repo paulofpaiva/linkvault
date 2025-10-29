@@ -9,7 +9,7 @@ import { eq } from 'drizzle-orm';
 import { AppError } from '../middleware/errorHandler.middleware.js';
 import { AuthRequest, requireAuth } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const router: import('express').Router = Router();
 
 const generateTokens = (userId: string) => {
   if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {

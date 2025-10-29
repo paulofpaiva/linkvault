@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/db/migrate.ts && tsx watch src/index.ts",
-    "build": "tsc -b",
+    "build": "pnpm -w --filter @linkvault/shared... build && tsc -b",
     "start": "node dist/index.js",
     "migrate": "tsx src/db/migrate.ts",
     "db:generate": "drizzle-kit generate",
