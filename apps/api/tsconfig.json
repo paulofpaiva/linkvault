@@ -10,8 +10,12 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "composite": true
   },
+  "references": [
+    { "path": "../../packages/shared" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
