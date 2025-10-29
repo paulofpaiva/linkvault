@@ -1,0 +1,22 @@
+{
+  "name": "linkvault",
+  "version": "1.0.0",
+  "private": true,
+  "description": "linkvault monorepo",
+  "scripts": {
+    "dev": "pnpm --filter api dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "build": "pnpm --filter api build",
+    "build:api": "pnpm --filter api build",
+    "build:web": "pnpm --filter web build",
+    "build:all": "pnpm -r build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
+
