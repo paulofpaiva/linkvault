@@ -21,6 +21,6 @@ WORKDIR /app/apps/api
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD sh -c "node dist/db/migrate.js && node dist/index.js"
+CMD sh -c "node dist/src/db/migrate.js && node dist/src/index.js"
 
 
