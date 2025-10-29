@@ -10,11 +10,12 @@ COPY package.json package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY apps/api/package.json apps/api/package.json
 
-RUN pnpm -r install --frozen-lockfile
+RUN pnpm -w install --frozen-lockfile --filter @linkvault/shared... --filter ./apps/api...
 
 COPY . .
 
-RUN pnpm -r build
+RUN pnpm -w --filter @linkvault/shared... build \
+  && pnpm -w --filter ./apps/api... build
 
 WORKDIR /app/apps/api
 
