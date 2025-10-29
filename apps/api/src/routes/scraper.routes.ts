@@ -3,7 +3,7 @@ import { AppError } from '../middleware/errorHandler.middleware.js';
 import { AuthRequest, requireAuth } from '../middleware/auth.middleware.js';
 import { fetchPageTitle } from '../utils/linkScraper.js';
 
-const router: import('express').Router = Router();
+const router = Router();
 
 router.use(requireAuth);
 
