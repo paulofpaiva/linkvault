@@ -2,17 +2,18 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
+    "lib": ["ES2022"],
     "moduleResolution": "bundler",
-    "strict": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@linkvault/shared": ["../../packages/shared/src/index.ts"],
-      "@linkvault/shared/*": ["../../packages/shared/src/*"]
-    }
+    "rootDir": "./src",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
+

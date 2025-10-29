@@ -13,12 +13,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0',
-    allowedHosts: ['linkvault.up.railway.app'],
   },
   preview: {
     port: 5173,
     host: '0.0.0.0',
     strictPort: true,
-    allowedHosts: ['linkvault.up.railway.app'],
   },
 })
