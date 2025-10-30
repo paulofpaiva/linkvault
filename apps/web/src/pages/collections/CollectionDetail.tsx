@@ -11,6 +11,7 @@ import AddLinksToCollectionModal from '@/components/modals/AddLinksToCollectionM
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import CollectionHeaderSkeleton from '@/components/skeletons/CollectionHeaderSkeleton';
 
 export default function CollectionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -22,45 +23,49 @@ export default function CollectionDetail() {
   return (
     <div className="space-y-6">
       <Breadcrumb label="Back to collections" backTo="/collections" />
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">{detail.data?.title ?? 'Collection'}</h2>
-        </div>
-        <div className="flex gap-2 sm:flex-shrink-0">
-          <motion.div 
-            whileHover={{ y: -2, scale: 1.04 }} 
-            whileTap={{ scale: 0.995 }} 
-            transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}
-          >
-            <Button onClick={() => setIsAddOpen(true)} className="flex-1 sm:flex-initial">
-              <Plus className="h-4 w-4 mr-2" />
-              Add link
-            </Button>
-          </motion.div>
-          <motion.div 
-            whileHover={{ y: -2, scale: 1.04 }} 
-            whileTap={{ scale: 0.995 }} 
-            transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
-            <Button
-              variant="outline"
-              className="flex-1 sm:flex-initial"
-              disabled={Boolean(detail.data?.isPrivate)}
-              onClick={async () => {
-                if (!id) return;
-                const url = `${window.location.origin}/public-collection/${id}`;
-                try {
-                  await navigator.clipboard.writeText(url);
-                  toast.success('Link copied to clipboard');
-                } catch {
-                  toast.error('Failed to copy link');
-                }
-              }}
+      {detail.isLoading || !detail.data ? (
+        <CollectionHeaderSkeleton />
+      ) : (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">{detail.data?.title ?? 'Collection'}</h2>
+          </div>
+          <div className="flex gap-2 sm:flex-shrink-0">
+            <motion.div 
+              whileHover={{ y: -2, scale: 1.04 }} 
+              whileTap={{ scale: 0.995 }} 
+              transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}
             >
-              <Link2Icon className="h-4 w-4" />
-            </Button>
-          </motion.div>
+              <Button onClick={() => setIsAddOpen(true)} className="flex-1 sm:flex-initial">
+                <Plus className="h-4 w-4 mr-2" />
+                Add link
+              </Button>
+            </motion.div>
+            <motion.div 
+              whileHover={{ y: -2, scale: 1.04 }} 
+              whileTap={{ scale: 0.995 }} 
+              transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
+              <Button
+                variant="outline"
+                className="flex-1 sm:flex-initial"
+                disabled={Boolean(detail.data?.isPrivate)}
+                onClick={async () => {
+                  if (!id) return;
+                  const url = `${window.location.origin}/public-collection/${id}`;
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    toast.success('Link copied to clipboard');
+                  } catch {
+                    toast.error('Failed to copy link');
+                  }
+                }}
+              >
+                <Link2Icon className="h-4 w-4" />
+              </Button>
+            </motion.div>
+          </div>
         </div>
-      </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

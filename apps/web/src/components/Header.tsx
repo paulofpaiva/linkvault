@@ -15,11 +15,6 @@ export default function Header() {
 
   const dropdownItems = [
     {
-      label: theme === 'dark' ? 'Light mode' : 'Dark mode',
-      icon: theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
-      onClick: () => toggleTheme(),
-    },
-    {
       label: 'Profile',
       icon: <User className="h-4 w-4" />,
       href: '/profile',
@@ -33,6 +28,11 @@ export default function Header() {
       label: 'Collections',
       icon: <Folder className="h-4 w-4" />,
       href: '/collections',
+    },
+    {
+      label: theme === 'dark' ? 'Light mode' : 'Dark mode',
+      icon: theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
+      onClick: () => toggleTheme(),
     },
     {
       label: 'Logout',

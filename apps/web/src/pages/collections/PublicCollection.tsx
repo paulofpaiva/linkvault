@@ -6,6 +6,9 @@ import { Error as ErrorState } from '@/components/ui/error';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { Empty } from '@/components/ui/empty';
+import { Folder } from 'lucide-react';
+import PublicCollectionHeaderSkeleton from '@/components/skeletons/PublicCollectionHeaderSkeleton';
 
 export default function PublicCollection() {
   const { id } = useParams<{ id: string }>();
@@ -14,43 +17,66 @@ export default function PublicCollection() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        <div className="rounded-xl border bg-accent/30 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div className="text-sm">
-            <span className="font-medium">Preview:</span> This collection was shared with you. Create an account to save and organize your own links.
+        {!isLoading && (
+          <div className="rounded-xl border bg-accent/30 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="text-sm">
+              <span className="font-medium">Preview:</span> This collection was shared with you. Create an account to save and organize your own links.
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate('/auth/sign-in')}>Sign In</Button>
+              <Button size="sm" onClick={() => navigate('/auth/sign-up')}>Sign Up</Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate('/auth/sign-in')}>Sign In</Button>
-            <Button size="sm" onClick={() => navigate('/auth/sign-up')}>Sign Up</Button>
-          </div>
-        </div>
+        )}
 
-        <header className="space-y-1">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <h1 className="text-3xl font-bold tracking-tight flex-1 min-w-0">
-              <span className="block truncate">{meta?.title ?? 'Collection'}</span>
-            </h1>
-            <span className="text-xs px-2 py-1 rounded-full border text-muted-foreground whitespace-nowrap flex-shrink-0 mt-1 md:mt-0">
-              {meta?.linkCount ?? 0} links
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            by {owner?.name ?? 'Unknown'}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {meta?.createdAt ? `created at ${format(new Date(meta.createdAt), 'PPP')}` : ''}
-          </p>
-        </header>
+        {isLoading || !meta ? (
+          <PublicCollectionHeaderSkeleton />
+        ) : (
+          <header className="space-y-1">
+            {!meta?.isPrivate && (
+              <>
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <h1 className="text-3xl font-bold tracking-tight flex-1 min-w-0">
+                    <span className="block truncate">{meta?.title ?? 'Collection'}</span>
+                  </h1>
+                  <span className="text-xs px-2 py-1 rounded-full border text-muted-foreground whitespace-nowrap flex-shrink-0 mt-1 md:mt-0">
+                    {meta?.linkCount ?? 0} links
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  by {owner?.name ?? 'Unknown'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {meta?.createdAt ? `created at ${format(new Date(meta.createdAt), 'PPP')}` : ''}
+                </p>
+              </>
+            )}
+          </header>
+        )}
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <LinkCardSkeleton count={6} />
           </div>
+        ) : meta?.isPrivate ? (
+          <ErrorState
+            title="Private collection"
+            description="This collection is private and cannot be accessed."
+            actionLabel="Go back"
+            onAction={() => navigate('/collections')}
+          />
         ) : error ? (
           <ErrorState
             title="Error loading collection"
             description="Try again in a few seconds or reload the page."
             actionLabel="Try again"
             onAction={() => refetch()}
+          />
+        ) : items.length === 0 ? (
+          <Empty
+            icon={Folder}
+            title="No links in this collection"
+            description="This public collection doesn't have any links yet."
           />
         ) : (
           <>

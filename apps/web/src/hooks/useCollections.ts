@@ -75,6 +75,7 @@ export const useUpdateCollection = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Collection updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error updating collection';

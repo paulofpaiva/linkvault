@@ -4,18 +4,20 @@ import type { ApiResponse, Link } from '@linkvault/shared';
 
 interface PublicCollectionMeta {
   id: string;
-  title: string;
-  description: string | null;
-  color: string;
-  createdAt: string;
-  linkCount: number;
+  // When collection is private, only isPrivate is guaranteed
+  isPrivate?: boolean;
+  title?: string;
+  description?: string | null;
+  color?: string;
+  createdAt?: string;
+  linkCount?: number;
 }
 
 interface PublicCollectionResponse {
   collection: PublicCollectionMeta;
-  owner: { name: string };
-  links: Link[];
-  pagination: {
+  owner?: { name: string };
+  links?: Link[];
+  pagination?: {
     page: number;
     limit: number;
     total: number;
@@ -33,6 +35,7 @@ export function usePublicCollection(id: string | undefined, limit: number = 10) 
       return response.data.data as PublicCollectionResponse;
     },
     getNextPageParam: (last) => {
+      if (!last.pagination) return undefined;
       const { page, totalPages } = last.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
@@ -44,7 +47,7 @@ export function usePublicCollection(id: string | undefined, limit: number = 10) 
   const pages = data?.pages ?? [];
   const meta = pages[0]?.collection;
   const owner = pages[0]?.owner;
-  const items = pages.flatMap((p) => p.links);
+  const items = pages.flatMap((p) => p.links ?? []);
 
   return {
     meta,

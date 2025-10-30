@@ -19,7 +19,16 @@ router.get('/:id', async (req: any, res: Response, next: NextFunction) => {
       throw new AppError(404, 'Collection not found');
     }
     if (collection.isPrivate) {
-      throw new AppError(404, 'Collection not found');
+      // For private collections, return minimal payload indicating privacy
+      return res.success(
+        {
+          collection: {
+            id: collection.id,
+            isPrivate: true,
+          },
+        },
+        'Collection is private'
+      );
     }
 
     const owner = await db.query.users.findFirst({
@@ -56,6 +65,7 @@ router.get('/:id', async (req: any, res: Response, next: NextFunction) => {
           color: collection.color,
           createdAt: collection.createdAt,
           linkCount,
+          isPrivate: false,
         },
         owner: { name: owner?.name ?? 'Unknown' },
         links: linksList,
