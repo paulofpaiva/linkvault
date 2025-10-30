@@ -2,13 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { queryClient } from './lib/queryClient';
-
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
-
 import AuthLayout from './layouts/AuthLayout';
 import RootLayout from './layouts/RootLayout';
-
 import Landing from './pages/Landing';
 import Auth from './pages/auth/Auth';
 import Home from './pages/Home';
@@ -49,8 +46,19 @@ function App() {
         </Routes>
       </BrowserRouter>
 
-      {/* Toaster for notifications */}
-      <Toaster position="top-right" richColors />
+      <Toaster
+        position="top-right"
+        richColors={false}
+        theme="light"
+        toastOptions={{
+          classNames: {
+            toast: 'bg-white text-black border',
+            description: 'text-black/70',
+            actionButton: 'bg-black text-white',
+            cancelButton: 'bg-white text-black border',
+          },
+        }}
+      />
     </QueryClientProvider>
   );
 }

@@ -91,14 +91,12 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
               </div>
             </button>
           ) : (
-            <button
-              onClick={handleArchive}
-              disabled={archiveLinkMutation.isPending}
-              className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50"
-              aria-label="Unarchive"
+            <div
+              className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-muted"
+              aria-hidden="true"
             >
               <Archive className="h-3 w-3 text-muted-foreground" />
-            </button>
+            </div>
           )}
           <CardTitle className="text-lg flex-1 truncate">{link.title}</CardTitle>
           <ResponsiveDropdown
