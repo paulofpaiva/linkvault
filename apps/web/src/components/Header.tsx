@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useLogout } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
-import { User, LogOut, Sun, Moon, Link2, Folder, Menu, LogIn, UserPlus, Bookmark } from 'lucide-react';
+import { User, LogOut, Sun, Moon, Menu, LogIn, UserPlus, Bookmark } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Link } from 'react-router-dom';
 import { getInitials } from '@/lib/text';
@@ -20,16 +20,6 @@ export default function Header() {
       label: 'Profile',
       icon: <User className="h-4 w-4" />,
       href: '/profile',
-    },
-    {
-      label: 'Links',
-      icon: <Link2 className="h-4 w-4" />,
-      href: '/links',
-    },
-    {
-      label: 'Collections',
-      icon: <Folder className="h-4 w-4" />,
-      href: '/collections',
     },
     {
       label: theme === 'dark' ? 'Light mode' : 'Dark mode',
