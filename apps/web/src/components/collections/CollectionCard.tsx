@@ -1,9 +1,9 @@
-import { Folder, MoreVertical, Edit, Trash2, Lock } from 'lucide-react';
+import { Folder, MoreVertical, Edit, Trash2, Lock, Copy } from 'lucide-react';
 import type { CollectionWithCount } from '@/types/collections';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import { useState } from 'react';
 import ConfirmDeleteCollectionModal from '@/components/modals/ConfirmDeleteCollectionModal';
-import { useDeleteCollection } from '@/hooks/useCollections';
+import { useCloneCollection, useDeleteCollection } from '@/hooks/useCollections';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 
@@ -16,6 +16,7 @@ interface Props {
 export default function CollectionCard({ collection, onClick, onEdit }: Props) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const deleteCollectionMutation = useDeleteCollection();
+  const cloneCollectionMutation = useCloneCollection();
 
   const dropdownItems = [
     {
@@ -23,6 +24,21 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
       icon: <Edit className="h-4 w-4" />,
       onClick: () => onEdit?.(collection),
       disabled: !onEdit,
+    },
+    {
+      label: 'Clone',
+      icon: <Copy className="h-4 w-4" />,
+      onClick: () => {
+        const start = new CustomEvent('collection:cloning-start')
+        window.dispatchEvent(start)
+        cloneCollectionMutation.mutate(collection.id, {
+          onSettled: () => {
+            const end = new CustomEvent('collection:cloning-end')
+            window.dispatchEvent(end)
+          }
+        })
+      },
+      disabled: cloneCollectionMutation.isPending,
     },
     {
       label: 'Delete',

@@ -16,7 +16,6 @@ export default function CollectionCardSkeleton({ count = 1 }: Props) {
           </CardHeader>
           <CardContent className="space-y-2">
             <Skeleton className="h-3 w-5/6" />
-            <Skeleton className="h-3 w-24" />
           </CardContent>
         </Card>
       ))}

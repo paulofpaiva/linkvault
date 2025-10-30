@@ -199,3 +199,21 @@ export const useAddLinksToCollection = (collectionId: string) => {
     },
   });
 };
+
+export const useCloneCollection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (collectionId: string) => {
+      const response = await api.post<ApiResponse<any>>(`/collections/${collectionId}/clone`);
+      return response.data;
+    },
+    onSuccess: (response) => {
+      toast.success(response.message || 'Collection cloned successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Error cloning collection';
+      toast.error(message);
+    },
+  });
+};

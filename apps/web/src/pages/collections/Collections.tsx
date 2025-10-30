@@ -5,7 +5,7 @@ import type { CollectionWithCount } from '@/types/collections';
 import CollectionCard from '@/components/collections/CollectionCard';
 import CollectionCardSkeleton from '@/components/skeletons/CollectionCardSkeleton';
 import { Folder } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManageCollectionModal from '@/components/modals/ManageCollectionModal';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,19 @@ export default function Collections() {
   const { items, isLoading, error, isFetchingNextPage, hasNextPage, setSentinelRef, refetch } = useCollections(10);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [collectionToEdit, setCollectionToEdit] = useState<CollectionWithCount | null>(null);
+  const [isCloning, setIsCloning] = useState(false);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const onStart = () => setIsCloning(true);
+    const onEnd = () => setIsCloning(false);
+    window.addEventListener('collection:cloning-start', onStart as EventListener);
+    window.addEventListener('collection:cloning-end', onEnd as EventListener);
+    return () => {
+      window.removeEventListener('collection:cloning-start', onStart as EventListener);
+      window.removeEventListener('collection:cloning-end', onEnd as EventListener);
+    };
+  }, []);
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -62,6 +74,11 @@ export default function Collections() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {isCloning && (
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                <CollectionCardSkeleton />
+              </motion.div>
+            )}
             {items.map((c: CollectionWithCount) => (
               <CollectionCard
                 key={c.id}

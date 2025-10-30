@@ -313,6 +313,71 @@ router.delete('/:id/links/:linkId', async (req: AuthRequest, res: Response, next
   }
 });
 
+// POST /collections/:id/clone - clone collection with its links
+router.post('/:id/clone', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId!;
+    const id = req.params.id;
+
+    const existing = await db.query.collections.findFirst({
+      where: and(eq(collections.id, id), eq(collections.userId, userId)),
+      with: { collectionLinks: true },
+    });
+
+    if (!existing) {
+      throw new AppError(404, 'Collection not found');
+    }
+
+    const baseTitle = existing.title;
+    let newTitle = `${baseTitle} (Copy)`;
+
+    // Ensure unique title for the user
+    const existingTitles = await db.query.collections.findMany({
+      where: eq(collections.userId, userId),
+      columns: { title: true },
+    });
+    const titleSet = new Set(existingTitles.map((t) => t.title));
+    if (titleSet.has(newTitle)) {
+      let i = 2;
+      while (titleSet.has(`${baseTitle} (Copy ${i})`)) i += 1;
+      newTitle = `${baseTitle} (Copy ${i})`;
+    }
+
+    const created = await db.transaction(async (tx) => {
+      const [newCollection] = await tx
+        .insert(collections)
+        .values({
+          userId,
+          title: newTitle,
+          description: existing.description,
+          color: existing.color,
+          isPrivate: existing.isPrivate,
+        })
+        .returning();
+
+      if (existing.collectionLinks.length > 0) {
+        const values = existing.collectionLinks.map((cl) => ({
+          collectionId: newCollection.id,
+          linkId: cl.linkId,
+        }));
+        await tx.insert(collectionLinks).values(values);
+      }
+
+      return newCollection;
+    });
+
+    // Artificial delay to enhance UI skeleton visibility
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    res.status(201).success(
+      { ...created, linkCount: existing.collectionLinks.length },
+      'Collection cloned successfully'
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
 
 
