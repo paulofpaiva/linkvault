@@ -3,6 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import authRoutes from './routes/auth.routes.js';
 import linksRoutes from './routes/links.routes.js';
 import scraperRoutes from './routes/scraper.routes.js';
@@ -10,6 +13,12 @@ import categoriesRoutes from './routes/categories.routes.js';
 import { rateLimiter } from './middleware/rateLimiter.middleware.js';
 import { responseWrapper } from './middleware/responseWrapper.middleware.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, '../../package.json'), 'utf-8')
+);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -27,6 +36,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(rateLimiter);
 app.use(responseWrapper);
+
+app.get('/', (req, res) => {
+  res.json({
+    ok: true,
+    name: packageJson.name,
+    version: packageJson.version,
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
