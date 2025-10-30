@@ -9,12 +9,14 @@ import { AlertTriangle, Lock } from 'lucide-react';
 import { useDeleteAccount } from '@/hooks/useAuth';
 import ChangePasswordModal from '@/components/modals/ChangePasswordModal';
 import { getInitials } from '@/lib/text';
+import ThemeSelector from '@/components/ThemeSelector';
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const deleteAccountMutation = useDeleteAccount();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  
   
   const handleConfirmDelete = () => {
     deleteAccountMutation.mutate(undefined, {
@@ -42,13 +44,13 @@ export default function Profile() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
-            <Avatar className="h-10 w-10 md:h-20 md:w-20">
+            <Avatar className="h-8 w-8 md:h-20 md:w-20">
               <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm md:text-2xl">
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
               </Avatar>
             <div>
-              <h3 className="text-xl font-semibold">{user?.name}</h3>
+              <h3 className="text-xl font-semibold max-w-[220px] truncate md:max-w-none md:truncate-none">{user?.name}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
@@ -66,7 +68,18 @@ export default function Profile() {
               <label className="text-sm font-medium text-muted-foreground">Account ID</label>
               <p className="text-base font-mono text-sm">{user?.id}</p>
             </div>
-            <div className='flex flex-col gap-2'>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold">Appearance</h3>
+            <p className="text-sm text-muted-foreground">Customize how Linkvault looks to you</p>
+            <ThemeSelector />
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold">Security</h3>
+            <p className="text-sm text-muted-foreground">Manage your password and account safety</p>
+            <div className='flex flex-col gap-2 mt-3'>
               <Button
                 className='w-full'
                 variant="outline"
@@ -85,8 +98,11 @@ export default function Profile() {
               </Button>
             </div>
           </div>
+
         </CardContent>
       </Card>
+
+      
       <ConfirmDeleteAccountModal
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
