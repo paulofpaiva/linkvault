@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  avatarUrl: string | null;
 }
 
 interface AuthActions {
@@ -23,7 +24,7 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       accessToken: null,
       isAuthenticated: false,
-
+      avatarUrl: null,
       setAuth: (user, accessToken) => {
         set({
           user,

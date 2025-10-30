@@ -2,12 +2,16 @@ import { pgTable, uuid, text, timestamp, pgEnum, boolean, uniqueIndex } from 'dr
 import { relations } from 'drizzle-orm';
 
 export const linkStatusEnum = pgEnum('link_status', ['unread', 'read', 'archived']);
+export const authProviderEnum = pgEnum('auth_provider', ['local', 'google']);
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  password: text('password').notNull(),
+  password: text('password'),
+  provider: authProviderEnum('provider').notNull().default('local'),
+  providerId: text('provider_id'),
+  avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });

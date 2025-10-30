@@ -1,10 +1,24 @@
+import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Breadcrumb from '@/components/Breadcrumb';
+import { Button } from '@/components/ui/button';
+import { FcGoogle } from 'react-icons/fc';
+import ConfirmDeleteAccountModal from '@/components/modals/ConfirmDeleteAccountModal';
+import { AlertTriangle } from 'lucide-react';
+import { useDeleteAccount } from '@/hooks/useAuth';
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const deleteAccountMutation = useDeleteAccount();
+
+  const handleConfirmDelete = () => {
+    deleteAccountMutation.mutate(undefined, {
+      onSettled: () => setIsDeleteOpen(false),
+    });
+  };
 
   const getInitials = (name: string) => {
     const names = name.trim().split(' ');
@@ -35,13 +49,25 @@ export default function Profile() {
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-2xl">
-                {user?.name ? getInitials(user.name) : 'U'}
-              </AvatarFallback>
+              {user?.avatarUrl && user.avatarUrl !== null ? (
+                <AvatarImage src={user.avatarUrl} alt={user.name} loading="lazy" referrerPolicy="no-referrer" />
+              ) : (
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-2xl">
+                  {user?.name ? getInitials(user.name) : 'U'}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
               <h3 className="text-xl font-semibold">{user?.name}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
+              {user?.providerId && (
+                <div className="mt-2">
+                  <Button variant="secondary" size="sm" className="gap-2" >
+                    <FcGoogle className="h-4 w-4" />
+                    Authenticated with Google
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -58,9 +84,25 @@ export default function Profile() {
               <label className="text-sm font-medium text-muted-foreground">Account ID</label>
               <p className="text-base font-mono text-sm">{user?.id}</p>
             </div>
+            <div>
+              <Button
+                className='w-full'
+                variant="destructive"
+                onClick={() => setIsDeleteOpen(true)}
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span>Delete Account</span> 
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
+      <ConfirmDeleteAccountModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={deleteAccountMutation.isPending}
+      />
     </div>
   );
 }

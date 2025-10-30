@@ -196,6 +196,7 @@ export default function LinkCard({ link, onEdit, dropdownMode = 'default', onRem
       onClose={() => setIsDeleteOpen(false)}
       onConfirm={handleConfirmDelete}
       linkTitle={link.title}
+      isLoading={deleteLinkMutation.isPending}
     />
     </Card>
     </motion.div>

@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useLogout } from '@/hooks/useAuth';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import { User, LogOut, Sun, Moon, Link2, Folder, Menu, LogIn, UserPlus } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -91,9 +91,18 @@ export default function Header() {
               trigger={
                 <button className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
                   <Avatar className="h-10 w-10 cursor-pointer">
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {user?.name ? getInitials(user.name) : 'U'}
-                    </AvatarFallback>
+                    {user?.avatarUrl && user.avatarUrl !== null ? (
+                      <AvatarImage
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {user?.name ? getInitials(user.name) : 'U'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </button>
               }

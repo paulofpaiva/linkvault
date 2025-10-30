@@ -7,6 +7,7 @@ interface ConfirmDeleteLinkModalProps {
   onClose: () => void
   onConfirm: () => void
   linkTitle?: string
+  isLoading: boolean
 }
 
 export default function ConfirmDeleteLinkModal({
@@ -14,6 +15,7 @@ export default function ConfirmDeleteLinkModal({
   onClose,
   onConfirm,
   linkTitle,
+  isLoading,
 }: ConfirmDeleteLinkModalProps) {
   return (
     <ResponsiveModal
@@ -26,6 +28,7 @@ export default function ConfirmDeleteLinkModal({
           variant="destructive"
           onClick={onConfirm}
           className="flex-1"
+          disabled={isLoading}
         >
           Delete
         </Button>

@@ -87,6 +87,7 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
         collectionTitle={collection.title}
+        isLoading={deleteCollectionMutation.isPending}
       />
     </>
   );

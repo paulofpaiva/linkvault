@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/text';
 import { useLogout } from '@/hooks/useAuth';
 import { LogOut } from 'lucide-react';
@@ -31,9 +31,13 @@ export default function Landing() {
               variant="outline"
             >
               <Avatar className="h-6 w-6 mr-2 border">
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                  {user?.name ? getInitials(user.name) : 'U'}
-                </AvatarFallback>
+                {user?.avatarUrl && user.avatarUrl !== null ? (
+                  <AvatarImage src={user.avatarUrl} alt={user.name} loading="lazy" referrerPolicy="no-referrer" />
+                ) : (
+                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                    {user?.name ? getInitials(user.name) : 'U'}
+                  </AvatarFallback>
+                )}
               </Avatar>
               Continue as {user?.name}
             </Button>
@@ -54,16 +58,10 @@ export default function Landing() {
               <div className="flex gap-4 justify-center">
                 <Button
                   size="lg"
+                  variant="default"
                   onClick={() => navigate('/auth/sign-in')}
                 >
-                  Sign In
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/auth/sign-up')}
-                >
-                  Sign Up
+                  Get Started
                 </Button>
               </div>
             </>
