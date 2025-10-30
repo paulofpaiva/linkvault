@@ -18,7 +18,7 @@ export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const [linkToEdit, setLinkToEdit] = useState<Link | null>(null);
-  const { data, isLoading, error } = useLinks(activeTab);
+  const { items, isLoading, isFetchingNextPage, hasNextPage, setSentinelRef, error, refetch } = useLinks(activeTab, 5);
 
   const handleEditLink = (link: Link) => {
     setLinkToEdit(link);
@@ -71,8 +71,10 @@ export default function Home() {
             <ErrorState
               title="Error loading links"
               description="Try again in a few seconds or reload the page."
+              actionLabel="Try again"
+              onAction={() => refetch()}
             />
-          ) : data?.links.length === 0 ? (
+          ) : items.length === 0 ? (
             <Empty
               icon={emptyState.icon}
               title={emptyState.title}
@@ -81,9 +83,15 @@ export default function Home() {
               onAction={emptyState.onAction}
             />
           ) : (
-            data?.links.map((link) => (
-              <LinkCard key={link.id} link={link} onEdit={handleEditLink} />
-            ))
+            <>
+              {items.map((link: Link) => (
+                <LinkCard key={link.id} link={link} onEdit={handleEditLink} />
+              ))}
+              {hasNextPage && (
+                <div ref={setSentinelRef} />
+              )}
+              {isFetchingNextPage && <LinkCardSkeleton count={5} />}
+            </>
           )}
         </TabsContent>
       </Tabs>

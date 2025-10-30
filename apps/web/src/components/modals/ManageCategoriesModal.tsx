@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useCategories, useDeleteCategory, useCreateCategory } from '@/hooks/useCategories';
 import type { Category } from '@linkvault/shared';
 import CategorySkeleton from '@/components/skeletons/CategorySkeleton';
+import { Error as ErrorState } from '@/components/ui/error';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface ManageCategoriesModalProps {
@@ -24,7 +25,7 @@ const PRESET_COLORS = [
 ];
 
 export default function ManageCategoriesModal({ isOpen, onClose }: ManageCategoriesModalProps) {
-  const { data, isLoading } = useCategories();
+  const { items, isLoading, isFetchingNextPage, hasNextPage, setSentinelRef, error, refetch } = useCategories(5);
   const deleteCategoryMutation = useDeleteCategory();
   const createCategoryMutation = useCreateCategory();
   const [view, setView] = useState<'list' | 'create'>('list');
@@ -110,14 +111,21 @@ export default function ManageCategoriesModal({ isOpen, onClose }: ManageCategor
 
           {isLoading ? (
             <CategorySkeleton count={5} />
-          ) : data?.categories.length === 0 ? (
+          ) : error ? (
+            <ErrorState
+              title="Error loading categories"
+              description="Try again in a few seconds or reload the page."
+              actionLabel="Try again"
+              onAction={() => refetch()}
+            />
+          ) : items.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No categories yet</p>
               <p className="text-sm">Create your first category to get started</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {data?.categories.map((category: Category) => (
+              {items.map((category: Category) => (
                 <div
                   key={category.id}
                   className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -137,6 +145,8 @@ export default function ManageCategoriesModal({ isOpen, onClose }: ManageCategor
                   </button>
                 </div>
               ))}
+              {hasNextPage && <div ref={setSentinelRef} />}
+              {isFetchingNextPage && <CategorySkeleton count={5} />}
             </div>
           )}
         </div>

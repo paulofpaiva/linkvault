@@ -26,7 +26,7 @@ export function Error({
         <p className="text-muted-foreground mb-6 max-w-sm">{description}</p>
       )}
       {actionLabel && onAction && (
-        <Button onClick={onAction}>{actionLabel}</Button>
+        <Button type="button" onClick={onAction}>{actionLabel}</Button>
       )}
     </div>
   );

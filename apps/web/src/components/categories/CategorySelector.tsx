@@ -4,6 +4,7 @@ import CategoryBadge from './CategoryBadge';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
+import { Error as ErrorState } from '@/components/ui/error';
 
 interface CategorySelectorProps {
   selectedIds: string[];
@@ -12,10 +13,10 @@ interface CategorySelectorProps {
 }
 
 export default function CategorySelector({ selectedIds, onChange, disabled }: CategorySelectorProps) {
-  const { data, isLoading } = useCategories();
+  const { items, isLoading, error, refetch, hasNextPage, isFetchingNextPage, setSentinelRef, fetchNextPage } = useCategories(5);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const availableCategories = data?.categories || [];
+  const availableCategories = items;
   const selectedCategories = availableCategories.filter(cat => selectedIds.includes(cat.id));
   const unselectedCategories = availableCategories.filter(cat => !selectedIds.includes(cat.id));
 
@@ -43,6 +44,20 @@ export default function CategorySelector({ selectedIds, onChange, disabled }: Ca
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-2">
+        <Label>Categories (optional)</Label>
+        <ErrorState
+          title="Error loading categories"
+          description="Try again in a few seconds or reload the page."
+          actionLabel="Try again"
+          onAction={() => refetch()}
+        />
+      </div>
+    );
+  }
+
   if (availableCategories.length === 0) {
     return (
       <div className="space-y-2">
@@ -58,7 +73,6 @@ export default function CategorySelector({ selectedIds, onChange, disabled }: Ca
     <div className="space-y-2">
       <Label>Categories (optional)</Label>
       
-      {/* Selected categories */}
       {selectedCategories.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {selectedCategories.map(category => (
@@ -73,7 +87,6 @@ export default function CategorySelector({ selectedIds, onChange, disabled }: Ca
         </div>
       )}
 
-      {/* Add category button / dropdown */}
       {unselectedCategories.length > 0 && (
         <div className="relative">
           <Button
@@ -113,6 +126,24 @@ export default function CategorySelector({ selectedIds, onChange, disabled }: Ca
                       <span className="flex-1 text-left truncate">{category.name}</span>
                     </button>
                   ))}
+                  {hasNextPage && (
+                    <div ref={setSentinelRef} className="h-4" />
+                  )}
+                  {isFetchingNextPage && (
+                    <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
+                      <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                      Loading more...
+                    </div>
+                  )}
+                  {hasNextPage && !isFetchingNextPage && (
+                    <button
+                      type="button"
+                      onClick={() => fetchNextPage()}
+                      className="w-full mt-1 px-3 py-2 text-xs rounded border hover:bg-accent"
+                    >
+                      Load more
+                    </button>
+                  )}
                 </div>
               </div>
             </>

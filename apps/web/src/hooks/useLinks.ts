@@ -1,16 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import type { InfiniteData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '@/lib/axios';
-import type { LinksResponse, ApiResponse, CreateLinkInput, UpdateLinkInput } from '@linkvault/shared';
+import type { LinksResponse, ApiResponse, CreateLinkInput, UpdateLinkInput, Link as LinkType } from '@linkvault/shared';
+import { useInfiniteScroll } from './useInfiniteScroll';
 
 type LinkFilter = 'all' | 'unread' | 'archived' | 'favorites';
 
-export const useLinks = (filter: LinkFilter = 'all', page: number = 1) => {
-  return useQuery({
-    queryKey: ['links', filter, page],
-    queryFn: async () => {
-      const params: Record<string, any> = { page, limit: 10 };
-      
+export const useLinks = (filter: LinkFilter = 'all', limit: number = 5) => {
+  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, LinkFilter, number]>({
+    queryKey: ['links', filter, limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params: Record<string, unknown> = { page: pageParam, limit };
+
       if (filter === 'favorites') {
         params.favorite = true;
       } else if (filter !== 'all') {
@@ -18,10 +20,54 @@ export const useLinks = (filter: LinkFilter = 'all', page: number = 1) => {
       }
 
       const response = await api.get<ApiResponse<LinksResponse>>('/links', { params });
-      return response.data.data;
+      return response.data.data as LinksResponse;
     },
+    getNextPageParam: (lastPage: LinksResponse) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
+
+  const data = query.data as InfiniteData<LinksResponse> | undefined;
+  const items = (data?.pages ?? []).flatMap((p: LinksResponse) => p.links);
+  const hasMore = Boolean(query.hasNextPage);
+  const setSentinelRef = useInfiniteScroll(
+    () => {
+      if (query.hasNextPage && !query.isFetchingNextPage) {
+        query.fetchNextPage();
+      }
+    },
+    hasMore,
+    query.isFetchingNextPage
+  );
+
+  return {
+    items,
+    isLoading: query.isLoading,
+    isFetchingNextPage: query.isFetchingNextPage,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    error: query.error,
+    refetch: query.refetch,
+    setSentinelRef,
+  };
 };
+function isInfiniteLinksData(
+  value: unknown
+): value is InfiniteData<LinksResponse> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'pages' in (value as Record<string, unknown>)
+  );
+}
+
+function hasFavorite(
+  value: unknown
+): value is LinkType & { isFavorite: boolean } {
+  return typeof value === 'object' && value !== null && 'isFavorite' in value;
+}
 
 export const useCreateLink = () => {
   const queryClient = useQueryClient();
@@ -74,12 +120,28 @@ export const useToggleRead = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['links'] });
 
-      queryClient.setQueriesData<LinksResponse>({ queryKey: ['links'] }, (old) => {
+      queryClient.setQueriesData({ queryKey: ['links'] }, (old) => {
         if (!old) return old;
 
+        // handle infinite data shape
+        if (isInfiniteLinksData(old)) {
+          return {
+            ...old,
+            pages: old.pages.map((page: LinksResponse) => ({
+              ...page,
+              links: page.links.map((link: LinkType) =>
+                link.id === linkId
+                  ? { ...link, status: link.status === 'read' ? 'unread' : 'read' }
+                  : link
+              ),
+            })),
+          };
+        }
+
+        // fallback single page shape
         return {
           ...old,
-          links: old.links.map((link) =>
+          links: (old as LinksResponse).links.map((link: LinkType) =>
             link.id === linkId
               ? { ...link, status: link.status === 'read' ? 'unread' : 'read' }
               : link
@@ -120,12 +182,26 @@ export const useArchiveLink = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['links'] });
 
-      queryClient.setQueriesData<LinksResponse>({ queryKey: ['links'] }, (old) => {
+      queryClient.setQueriesData({ queryKey: ['links'] }, (old) => {
         if (!old) return old;
+
+        if (isInfiniteLinksData(old)) {
+          return {
+            ...old,
+            pages: old.pages.map((page: LinksResponse) => ({
+              ...page,
+              links: page.links.map((link: LinkType) =>
+                link.id === linkId
+                  ? { ...link, status: link.status === 'archived' ? 'unread' : 'archived' }
+                  : link
+              ),
+            })),
+          };
+        }
 
         return {
           ...old,
-          links: old.links.map((link) =>
+          links: (old as LinksResponse).links.map((link: LinkType) =>
             link.id === linkId
               ? { ...link, status: link.status === 'archived' ? 'unread' : 'archived' }
               : link
@@ -166,14 +242,32 @@ export const useToggleFavorite = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['links'] });
 
-      queryClient.setQueriesData({ queryKey: ['links'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ['links'] }, (old) => {
         if (!old) return old;
+
+        if (isInfiniteLinksData(old)) {
+          return {
+            ...old,
+            pages: old.pages.map((page: LinksResponse) => ({
+              ...page,
+              links: page.links.map((link) => {
+                if (link.id === linkId && hasFavorite(link)) {
+                  return { ...link, isFavorite: !link.isFavorite };
+                }
+                return link;
+              }),
+            })),
+          };
+        }
 
         return {
           ...old,
-          links: old.links.map((link: any) =>
-            link.id === linkId ? { ...link, isFavorite: !link.isFavorite } : link
-          ),
+          links: (old as LinksResponse).links.map((link) => {
+            if (link.id === linkId && hasFavorite(link)) {
+              return { ...link, isFavorite: !link.isFavorite };
+            }
+            return link;
+          }),
         };
       });
 
@@ -210,12 +304,22 @@ export const useDeleteLink = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['links'] });
 
-      queryClient.setQueriesData<LinksResponse>({ queryKey: ['links'] }, (old) => {
+      queryClient.setQueriesData({ queryKey: ['links'] }, (old) => {
         if (!old) return old;
+
+        if (isInfiniteLinksData(old)) {
+          return {
+            ...old,
+            pages: old.pages.map((page: LinksResponse) => ({
+              ...page,
+              links: page.links.filter((link: LinkType) => link.id !== linkId),
+            })),
+          };
+        }
 
         return {
           ...old,
-          links: old.links.filter((link) => link.id !== linkId),
+          links: (old as LinksResponse).links.filter((link: LinkType) => link.id !== linkId),
         };
       });
 
