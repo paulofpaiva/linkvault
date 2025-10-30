@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useLogout } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
-import { User, LogOut, Sun, Moon, Link2, Folder, Menu, LogIn, UserPlus } from 'lucide-react';
+import { User, LogOut, Sun, Moon, Link2, Folder, Menu, LogIn, UserPlus, Bookmark } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Link } from 'react-router-dom';
 import { getInitials } from '@/lib/text';
@@ -68,26 +68,30 @@ export default function Header() {
     <header className="top-0 z-40 border-b bg-background/100">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link to="/links" className="text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-ring rounded">
-            linkvault
+          <Link
+            to="/links"
+            className="flex items-center gap-2 font-bold focus:outline-none focus:ring-2 focus:ring-ring rounded whitespace-nowrap"
+          >
+            <Bookmark className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+            <span className="text-lg sm:text-xl md:text-2xl leading-none">linkvault</span>
           </Link>
           {isAuthenticated && (
             <nav className="hidden md:flex items-center gap-4 text-sm">
               <Link
                 to="/links"
-                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-ring rounded px-1 py-0.5"
               >
                 Links
               </Link>
               <Link
                 to="/collections"
-                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-ring rounded px-1 py-0.5"
               >
                 Collections
               </Link>
               <button
                 onClick={openManageCategories}
-                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-ring rounded px-1 py-0.5"
               >
                 Categories
               </button>
