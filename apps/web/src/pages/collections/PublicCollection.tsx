@@ -1,0 +1,79 @@
+import { useParams } from 'react-router-dom';
+import { usePublicCollection } from '@/hooks/usePublicCollection';
+import PublicLinkCard from '@/components/links/PublicLinkCard';
+import LinkCardSkeleton from '@/components/skeletons/LinkCardSkeleton';
+import { Error as ErrorState } from '@/components/ui/error';
+import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+
+export default function PublicCollection() {
+  const { id } = useParams<{ id: string }>();
+  const { meta, owner, items, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, refetch } = usePublicCollection(id, 10);
+  const navigate = useNavigate();
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <div className="rounded-xl border bg-accent/30 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="text-sm">
+            <span className="font-medium">Preview:</span> This collection was shared with you. Create an account to save and organize your own links.
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/auth/sign-in')}>Sign In</Button>
+            <Button size="sm" onClick={() => navigate('/auth/sign-up')}>Sign Up</Button>
+          </div>
+        </div>
+
+        <header className="space-y-1">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <h1 className="text-3xl font-bold tracking-tight flex-1 min-w-0">
+              <span className="block truncate">{meta?.title ?? 'Collection'}</span>
+            </h1>
+            <span className="text-xs px-2 py-1 rounded-full border text-muted-foreground whitespace-nowrap flex-shrink-0 mt-1 md:mt-0">
+              {meta?.linkCount ?? 0} links
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            by {owner?.name ?? 'Unknown'}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {meta?.createdAt ? `created at ${format(new Date(meta.createdAt), 'PPP')}` : ''}
+          </p>
+        </header>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <LinkCardSkeleton count={6} />
+          </div>
+        ) : error ? (
+          <ErrorState
+            title="Error loading collection"
+            description="Try again in a few seconds or reload the page."
+            actionLabel="Try again"
+            onAction={() => refetch()}
+          />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {items.map((link) => (
+                <PublicLinkCard key={link.id} link={link} />
+              ))}
+            </div>
+            {hasNextPage && (
+              <div className="flex justify-center pt-4">
+                <button
+                  className="px-4 py-2 text-sm rounded border hover:bg-accent"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? 'Loading...' : 'Load more'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+    </div>
+  );
+}
+
+

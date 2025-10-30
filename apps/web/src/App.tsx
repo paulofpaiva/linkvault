@@ -13,6 +13,9 @@ import Profile from './pages/profile/Profile';
 import Collections from './pages/collections/Collections';
 import CollectionDetail from './pages/collections/CollectionDetail';
 import { ThemeProvider } from './contexts/ThemeContext';
+import PublicCollection from './pages/collections/PublicCollection';
+import PublicLayout from './layouts/PublicLayout';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route element={<PublicLayout />}>
+            <Route path="/public-collection/:id" element={<PublicCollection />} />
+          </Route>
 
           <Route
             path="/auth"
@@ -48,7 +54,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
 

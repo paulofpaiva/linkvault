@@ -10,6 +10,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import AddLinksToCollectionModal from '@/components/modals/AddLinksToCollectionModal';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function CollectionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +41,21 @@ export default function CollectionDetail() {
             whileHover={{ y: -2, scale: 1.04 }} 
             whileTap={{ scale: 0.995 }} 
             transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
-            <Button variant="outline" disabled className="flex-1 sm:flex-initial">
+            <Button
+              variant="outline"
+              className="flex-1 sm:flex-initial"
+              disabled={Boolean(detail.data?.isPrivate)}
+              onClick={async () => {
+                if (!id) return;
+                const url = `${window.location.origin}/public-collection/${id}`;
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success('Link copied to clipboard');
+                } catch {
+                  toast.error('Failed to copy link');
+                }
+              }}
+            >
               <Link2Icon className="h-4 w-4" />
             </Button>
           </motion.div>
