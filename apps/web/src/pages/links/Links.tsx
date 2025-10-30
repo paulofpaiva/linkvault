@@ -8,7 +8,7 @@ import LinkCard from '@/components/links/LinkCard';
 import LinkCardSkeleton from '@/components/skeletons/LinkCardSkeleton';
 import ManageLinkModal from '@/components/modals/ManageLinkModal';
 import ManageCategoriesModal from '@/components/modals/ManageCategoriesModal';
-import { Plus, Tag } from 'lucide-react';
+import { Plus} from 'lucide-react';
 import type { Link } from '@linkvault/shared';
 import { linksTabs, getEmptyStateConfig } from '@/hooks/useLinksTabs';
 import type { TabValue } from '@/hooks/useLinksTabs';
@@ -39,29 +39,21 @@ export default function Links() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">My Links</h2>
           <p className="text-muted-foreground">
             Manage and organize your saved links.
           </p>
         </div>
-        <div className="flex gap-2 sm:flex-shrink-0">
-          <motion.div 
-            whileHover={{ y: -2, scale: 1.04 }} 
-            whileTap={{ scale: 0.995 }} 
-            transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
-              <Button variant="outline" onClick={() => setIsCategoriesModalOpen(true)} className="flex-1 sm:flex-initial">
-                <Tag className="h-4 w-4 mr-2" />
-                Categories
-              </Button>
-          </motion.div>
+        <div className="flex gap-2 w-full md:w-auto">
           <motion.div 
             whileHover={{ y: -2, scale: 1.04 }} 
             whileTap={{ scale: 0.995 }} 
             transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}
+            className="w-full md:w-auto"
           >
-            <Button onClick={() => setIsCreateModalOpen(true)} className="flex-1 sm:flex-initial">
+            <Button onClick={() => setIsCreateModalOpen(true)} className="w-full md:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               New Link
             </Button>
@@ -71,7 +63,7 @@ export default function Links() {
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
         <div className="overflow-x-auto">
-          <TabsList className="w-full sm:w-auto">
+          <TabsList className="w-full md:w-auto">
             {linksTabs.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
             ))}

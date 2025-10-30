@@ -6,13 +6,15 @@ import { User, LogOut, Sun, Moon, Link2, Folder, Menu, LogIn, UserPlus } from 'l
 import { useTheme } from '@/contexts/ThemeContext';
 import { Link } from 'react-router-dom';
 import { getInitials } from '@/lib/text';
+import { useManageCategoriesContext } from '@/contexts/ManageCategoriesContext';
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logoutMutation = useLogout();
   const { theme, toggleTheme } = useTheme();
-
+  const { openManageCategories } = useManageCategoriesContext()
+  
   const dropdownItems = [
     {
       label: 'Profile',
@@ -83,6 +85,12 @@ export default function Header() {
               >
                 Collections
               </Link>
+              <button
+                onClick={openManageCategories}
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+              >
+                Categories
+              </button>
             </nav>
           )}
         </div>

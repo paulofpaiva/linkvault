@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import {Folder, User, Plus, Home, Tag } from 'lucide-react'
 import { useCreateLinkContext } from '@/contexts/CreateLinkContext'
 import { useManageCategoriesContext } from '@/contexts/ManageCategoriesContext'
+import { Fragment } from 'react'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
 
 export function BottomNavigation() {
@@ -35,9 +36,8 @@ export function BottomNavigation() {
               : location.pathname === item.href
 
             return (
-              <>
+              <Fragment key={item.id}>
                 <Link
-                  key={item.id}
                   to={item.href}
                   className={cn(
                     'flex items-center justify-center p-3 rounded-lg transition-colors duration-200 min-w-0 flex-1',
@@ -63,7 +63,7 @@ export function BottomNavigation() {
                     <Tag className="h-6 w-6" />
                   </button>
                 )}
-              </>
+              </Fragment>
             )
           })}
         <button

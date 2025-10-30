@@ -18,20 +18,20 @@ export default function RootLayout() {
 
   return (
     <div className="min-h-screen max-w-4xl mx-auto">
-      <Header />
-
       <CreateLinkProvider openCreateLink={openCreateLink}>
         <ManageCategoriesProvider openManageCategories={openManageCategories}>
+          <Header />
+
           <main className="container mx-auto px-4 py-8">
             <Outlet />
           </main>
 
           <BottomNavigation />
+
+          <ManageLinkModal isOpen={isCreateOpen} onClose={closeCreateLink} />
+          <ManageCategoriesModal isOpen={isCategoriesOpen} onClose={closeManageCategories} />
         </ManageCategoriesProvider>
       </CreateLinkProvider>
-
-      <ManageLinkModal isOpen={isCreateOpen} onClose={closeCreateLink} />
-      <ManageCategoriesModal isOpen={isCategoriesOpen} onClose={closeManageCategories} />
     </div>
   );
 }
