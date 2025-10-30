@@ -1,4 +1,4 @@
-import { Folder, MoreVertical, Edit, Trash2, Lock, Copy, Unlock } from 'lucide-react';
+import { Folder, MoreVertical, Edit, Trash2, Lock, Copy, Unlock, Link2Icon } from 'lucide-react';
 import type { CollectionWithCount } from '@/types/collections';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { useCloneCollection, useDeleteCollection, useToggleCollectionPrivacy } f
 import ConfirmToggleCollectionModal from '@/components/modals/ConfirmToggleCollectionModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface Props {
   collection: CollectionWithCount;
@@ -42,6 +43,20 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
         })
       },
       disabled: cloneCollectionMutation.isPending,
+    },
+    {
+      label: 'Copy link',
+      icon: <Link2Icon className="h-4 w-4" />,
+      onClick: async () => {
+        try {
+          const url = `${window.location.origin}/public-collection/${collection.id}`;
+          await navigator.clipboard.writeText(url);
+          toast.success('Link copied to clipboard');
+        } catch {
+          toast.error('Failed to copy link');
+        }
+      },
+      disabled: Boolean(collection.isPrivate),
     },
     {
       label: collection.isPrivate ? 'Make public' : 'Make private',
