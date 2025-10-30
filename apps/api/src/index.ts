@@ -12,7 +12,7 @@ import { responseWrapper } from './middleware/responseWrapper.middleware.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const rawOrigins = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 
