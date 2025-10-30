@@ -7,7 +7,10 @@
       "Bash(pnpm build:*)",
       "Bash(cat:*)",
       "Bash(docker compose:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(pnpm --filter @linkvault/shared build:*)",
+      "Bash(pnpm --filter api build:*)",
+      "Bash(pnpm --filter web build:*)"
     ],
     "deny": [],
     "ask": []
