@@ -42,8 +42,8 @@ export default function Profile() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-2xl">
+            <Avatar className="h-10 w-10 md:h-20 md:w-20">
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm md:text-2xl">
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
               </Avatar>
