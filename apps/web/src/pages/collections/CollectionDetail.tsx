@@ -5,7 +5,7 @@ import LinkCard from '@/components/links/LinkCard';
 import LinkCardSkeleton from '@/components/skeletons/LinkCardSkeleton';
 import { useCollectionDetail, useCollectionLinks, useRemoveLinkFromCollection } from '@/hooks/useCollections';
 import { Empty } from '@/components/ui/empty';
-import { Folder, Link2Icon, Plus } from 'lucide-react';
+import { Folder, Link2Icon, Plus, Lock } from 'lucide-react';
 import Breadcrumb from '@/components/Breadcrumb';
 import AddLinksToCollectionModal from '@/components/modals/AddLinksToCollectionModal';
 import { useState } from 'react';
@@ -27,8 +27,13 @@ export default function CollectionDetail() {
         <CollectionHeaderSkeleton />
       ) : (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">{detail.data?.title ?? 'Collection'}</h2>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <span className="truncate">{detail.data?.title ?? 'Collection'}</span>
+              {detail.data?.isPrivate && (
+                <Lock className="h-6 w-6 text-muted-foreground flex-shrink-0" aria-label="Private" />
+              )}
+            </h2>
           </div>
           <div className="flex gap-2 sm:flex-shrink-0">
             <motion.div 

@@ -70,11 +70,13 @@ export default function Links() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
-        <TabsList>
-          {linksTabs.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="w-full sm:w-auto">
+            {linksTabs.map((t) => (
+              <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         <TabsContent value={activeTab} className="space-y-4 mt-6">
           {isLoading ? (

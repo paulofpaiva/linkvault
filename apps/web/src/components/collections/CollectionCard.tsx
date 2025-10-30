@@ -53,28 +53,26 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
               <div className="mt-0.5">
                 <Folder className="h-6 w-6" style={{ color: collection.color }} />
               </div>
-              <CardTitle className="text-lg flex items-center gap-2 w-full">
-                <span className="flex-1 min-w-0 truncate flex items-center gap-2">
-                  <span className="truncate">{collection.title}</span>
-                  {collection.isPrivate && (
-                    <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-label="Private" />
-                  )}
-                </span>
-                <ResponsiveDropdown
-                  trigger={
-                    <button
-                      type="button"
-                      className="p-2 hover:bg-accent rounded flex-shrink-0"
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label="More options"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  }
-                  items={dropdownItems}
-                  align="end"
-                />
+              <CardTitle className="text-lg flex-1 flex items-center gap-2 min-w-0">
+                <span className="truncate">{collection.title}</span>
+                {collection.isPrivate && (
+                  <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-label="Private" />
+                )}
               </CardTitle>
+              <ResponsiveDropdown
+                trigger={
+                  <button
+                    type="button"
+                    className="p-1 hover:bg-accent rounded flex-shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="More options"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                }
+                items={dropdownItems}
+                align="end"
+              />
             </div>
           </CardHeader>
           <CardContent className="space-y-2 pt-2">

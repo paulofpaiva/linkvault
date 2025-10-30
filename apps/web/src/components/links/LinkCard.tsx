@@ -141,13 +141,13 @@ export default function LinkCard({ link, onEdit, dropdownMode = 'default', onRem
               </div>
             )
           ) : null}
-          <CardTitle className="text-lg flex-1 truncate flex items-center gap-2">
-            {link.title}
+          <CardTitle className="text-lg flex-1 flex items-center gap-2 min-w-0">
+            <span className="truncate">{link.title}</span>
             {link.isFavorite && (
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" aria-label="Favorite" />
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" aria-label="Favorite" />
             )}
             {link.isPrivate && (
-              <Lock className="h-4 w-4 text-muted-foreground" aria-label="Private" />
+              <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-label="Private" />
             )}
           </CardTitle>
           <ResponsiveDropdown
