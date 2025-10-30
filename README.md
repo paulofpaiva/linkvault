@@ -1,60 +1,64 @@
-![linkvault Logo](./assets/linkvault.png)
-# linkvault
+# LinkVault
 
-linkvault is a simple personal link manager. Save URLs, add notes, organize by categories, and track status (unread, read, archived). It includes authentication, pagination, and automatic page title fetching.
+A simple personal link manager. Save URLs, add notes, organize by categories, and track status (unread, read, archived). Includes authentication, pagination, and automatic page title fetching.
 
 ## Tech Stack
 
-- Node.js, Express, TypeScript
-- Drizzle ORM, PostgreSQL
-- JWT auth with httpOnly refresh cookies
-- Vite + React (web app)
-- Docker & Docker Compose
+- **Backend**: Node.js, Express, TypeScript, Drizzle ORM, PostgreSQL
+- **Frontend**: React, Vite, TailwindCSS, TanStack Query
+- **Auth**: JWT with httpOnly refresh cookies
+- **DevOps**: Docker, Docker Compose, pnpm workspaces
 
-## Quick Start
+## Setup
 
-### Using Docker (recommended)
-
-```bash
-# From repo root
-cp apps/api/env.example apps/api/.env
-cp env.example .env
-
-# Adjust apps/api/.env as needed (set FRONTEND_URL=http://localhost:5173)
-
-docker-compose up -d
-```
-
-- API: http://localhost:3000
-- Web: http://localhost:5173 (set `VITE_API_URL=http://localhost:3000` in your web env if needed)
-
-### Local Development
-
-Prerequisites: Node.js 18+, pnpm, PostgreSQL running locally
+### 1. Install Dependencies
 
 ```bash
-# Install deps
 pnpm install
-
-# Configure API env
-cd apps/api && cp env.example .env
-# Edit .env: DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, FRONTEND_URL=http://localhost:5173
-
-# Run DB migrations and start API
-pnpm migrate
-cd ../.. && pnpm dev:api
-
-# In a separate terminal, start the web app
-pnpm dev:web
 ```
 
-API is available at `http://localhost:3000`. Web at `http://localhost:5173`.
+### 2. Configure Environment Variables
 
-## Environment
+Copy the example file:
 
-See `apps/api/env.example` for required variables:
+```bash
+cp .env.example .env
+```
 
-- `DATABASE_URL` – PostgreSQL connection string
-- `JWT_SECRET` – Access token secret
-- `JWT_REFRESH_SECRET` – Refresh token secret
-- `PORT` – API port (default: 3000)
+Edit `.env` with your values. This is the **only .env file** for the entire monorepo.
+
+**For production**, generate secure secrets:
+```bash
+openssl rand -hex 32
+```
+
+### 3. Run the Application
+
+#### Option A: Docker (Recommended)
+
+```bash
+pnpm docker:up
+```
+
+Access:
+- Frontend: http://localhost:5173
+- API: http://localhost:3000
+
+
+#### Option B: Local Development
+
+Requirements: PostgreSQL running locally
+
+1. Update `.env` to use `localhost` instead of `db`:
+   ```bash
+   DATABASE_URL=postgresql://postgres:password@localhost:5432/linkvaultdb
+   ```
+
+2. Run in separate terminals:
+   ```bash
+   # Terminal 1
+   pnpm dev:api
+
+   # Terminal 2
+   pnpm dev:web
+   ```

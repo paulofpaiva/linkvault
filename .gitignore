@@ -1,8 +1,14 @@
 node_modules
 dist
-.env
-.env*
 *.log
 .DS_Store
 postgres_data
 
+.env
+.env.local
+.env.*.local
+
+!.env.example
+!**/.env.example
+
+*.md

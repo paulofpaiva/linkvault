@@ -7,8 +7,10 @@ declare module 'axios' {
   }
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + '/api',
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          import.meta.env.VITE_API_URL + '/auth/refresh',
+          `${API_BASE_URL}/api/auth/refresh`,
           {},
           { withCredentials: true }
         );
