@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { usePublicLinks, useAllLinks } from '@/hooks/useLinks';
+import { usePublicLinks, usePrivateLinks } from '@/hooks/useLinks';
 import type { Link } from '@linkvault/shared';
 import { Empty } from '@/components/ui/empty';
 import { Error as ErrorState } from '@/components/ui/error';
@@ -19,7 +19,7 @@ interface Props {
 
 export default function AddLinksToCollectionModal({ isOpen, onClose, collectionId, isCollectionPrivate }: Props) {
   const [search, setSearch] = useState('');
-  const hook = isCollectionPrivate ? useAllLinks : usePublicLinks;
+  const hook = isCollectionPrivate ? usePrivateLinks : usePublicLinks;
   const { items, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, refetch } = hook(10, search, collectionId);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 

@@ -113,12 +113,12 @@ export const usePublicLinks = (limit: number = 10, search: string = '', excludeC
   };
 };
 
-export const usePrivateLinks = (limit: number = 10, search: string = '') => {
-  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, number, string]>({
-    queryKey: ['private-links', limit, search],
+export const usePrivateLinks = (limit: number = 10, search: string = '', excludeCollectionId?: string) => {
+  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, number, string, string | undefined]>({
+    queryKey: ['private-links', limit, search, excludeCollectionId],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get<ApiResponse<LinksResponse>>('/links/private', {
-        params: { page: pageParam, limit, search: search || undefined },
+        params: { page: pageParam, limit, search: search || undefined, excludeCollectionId },
       });
       return response.data.data as LinksResponse;
     },
@@ -195,6 +195,8 @@ export const useUpdateLink = () => {
       queryClient.invalidateQueries({ queryKey: ['public-links'] });
       queryClient.invalidateQueries({ queryKey: ['all-links'] });
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['collection'], exact: false });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error updating link';
@@ -263,6 +265,8 @@ export const useToggleRead = () => {
       queryClient.invalidateQueries({ queryKey: ['public-links'] });
       queryClient.invalidateQueries({ queryKey: ['all-links'] });
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['collection'], exact: false });
     },
   });
 };
@@ -327,6 +331,8 @@ export const useArchiveLink = () => {
       queryClient.invalidateQueries({ queryKey: ['public-links'] });
       queryClient.invalidateQueries({ queryKey: ['all-links'] });
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['collection'], exact: false });
     },
   });
 };
@@ -393,6 +399,8 @@ export const useToggleFavorite = () => {
       queryClient.invalidateQueries({ queryKey: ['public-links'] });
       queryClient.invalidateQueries({ queryKey: ['all-links'] });
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['collection'], exact: false });
     },
   });
 };
@@ -449,6 +457,8 @@ export const useDeleteLink = () => {
       queryClient.invalidateQueries({ queryKey: ['public-links'] });
       queryClient.invalidateQueries({ queryKey: ['all-links'] });
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['collection'], exact: false });
     },
   });
 };

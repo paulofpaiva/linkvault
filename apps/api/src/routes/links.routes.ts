@@ -24,6 +24,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const offset = (page - 1) * limit;
     const search = (req.query.search as string | undefined)?.trim();
     const excludeCollectionId = req.query.excludeCollectionId as string | undefined;
+    const onlyPrivate = (req.query.onlyPrivate as string | undefined) === 'true';
 
     let parsedStatus: 'unread' | 'read' | 'archived' | undefined;
     if (statusFilter) {
@@ -38,6 +39,9 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     }
     if (favorite !== undefined) {
       whereCondition = and(whereCondition, eq(links.isFavorite, favorite));
+    }
+    if (onlyPrivate) {
+      whereCondition = and(whereCondition, eq(links.isPrivate, true));
     }
     if (search && search.length > 0) {
       const pattern = `%${search}%`;

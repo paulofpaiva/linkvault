@@ -269,7 +269,9 @@ router.get('/:id/links', async (req: AuthRequest, res: Response, next: NextFunct
       offset,
     });
 
-    const linksList = items.map((i) => i.link).filter((l) => !l.isPrivate);
+    const linksList = collection.isPrivate
+      ? items.map((i) => i.link)
+      : items.map((i) => i.link).filter((l) => !l.isPrivate);
 
     res.success(
       { links: linksList, pagination: { page, limit, total, totalPages } },
