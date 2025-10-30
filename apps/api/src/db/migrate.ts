@@ -1,6 +1,8 @@
 import '../config/env.js';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import postgres from 'postgres';
 
 const runMigrations = async () => {
@@ -20,9 +22,12 @@ const runMigrations = async () => {
   const db = drizzle(migrationClient);
 
   try {
-    // await migrate(db, { migrationsFolder: './apps/api/drizzle' });
-    // Caminho deve ser relativo ao diretório de trabalho (apps/api)
-    await migrate(db, { migrationsFolder: './drizzle' });
+      // OLD: await migrate(db, { migrationsFolder: './apps/api/drizzle' });
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const migrationsFolder = path.resolve(__dirname, '../../drizzle');
+
+    await migrate(db, { migrationsFolder });
     console.log('Migrations applied successfully');
     await migrationClient.end();
     process.exit(0);
