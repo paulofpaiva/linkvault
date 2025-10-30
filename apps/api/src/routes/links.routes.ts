@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { db } from '../db/index.js';
-import { links, linkCategories, categories } from '../db/schema.js';
-import { eq, and, count, inArray } from 'drizzle-orm';
+import { links, linkCategories, categories, collectionLinks, collections } from '../db/schema.js';
+import { eq, and, count, inArray, or, ilike, notInArray } from 'drizzle-orm';
 import { AppError } from '../middleware/errorHandler.middleware.js';
 import { AuthRequest, requireAuth } from '../middleware/auth.middleware.js';
 import { createLinkSchema, updateLinkSchema, linkStatusSchema } from '@linkvault/shared';
@@ -22,6 +22,8 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
     const offset = (page - 1) * limit;
+    const search = (req.query.search as string | undefined)?.trim();
+    const excludeCollectionId = req.query.excludeCollectionId as string | undefined;
 
     let parsedStatus: 'unread' | 'read' | 'archived' | undefined;
     if (statusFilter) {
@@ -36,6 +38,28 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     }
     if (favorite !== undefined) {
       whereCondition = and(whereCondition, eq(links.isFavorite, favorite));
+    }
+    if (search && search.length > 0) {
+      const pattern = `%${search}%`;
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(links.title, pattern),
+          ilike(links.url, pattern),
+          ilike(links.notes, pattern)
+        )
+      );
+    }
+
+    if (excludeCollectionId) {
+      const existing = await db
+        .select({ linkId: collectionLinks.linkId })
+        .from(collectionLinks)
+        .where(eq(collectionLinks.collectionId, excludeCollectionId));
+      const excludeIds = existing.map((r) => r.linkId);
+      if (excludeIds.length > 0) {
+        whereCondition = and(whereCondition, notInArray(links.id, excludeIds));
+      }
     }
 
     const [totalResult] = await db
@@ -82,6 +106,142 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       res.error('Invalid status. Use: unread, read or archived', 400);
       return;
     }
+    next(error);
+  }
+});
+
+// GET /links/public - list user's public links with pagination
+router.get('/public', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId!;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+    const search = (req.query.search as string | undefined)?.trim();
+    const excludeCollectionId = req.query.excludeCollectionId as string | undefined;
+
+    let whereCondition: any = and(eq(links.userId, userId), eq(links.isPrivate, false));
+    if (search && search.length > 0) {
+      const pattern = `%${search}%`;
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(links.title, pattern),
+          ilike(links.url, pattern),
+          ilike(links.notes, pattern)
+        )
+      );
+    }
+
+    if (excludeCollectionId) {
+      const existing = await db
+        .select({ linkId: collectionLinks.linkId })
+        .from(collectionLinks)
+        .where(eq(collectionLinks.collectionId, excludeCollectionId));
+      const excludeIds = existing.map((r) => r.linkId);
+      if (excludeIds.length > 0) {
+        whereCondition = and(whereCondition, notInArray(links.id, excludeIds));
+      }
+    }
+
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(links)
+      .where(whereCondition);
+
+    const total = totalResult.count;
+    const totalPages = Math.ceil(total / limit);
+
+    const publicLinks = await db.query.links.findMany({
+      where: whereCondition,
+      orderBy: (l, { desc }) => [desc(l.createdAt)],
+      limit,
+      offset,
+      with: {
+        linkCategories: {
+          with: { category: true },
+        },
+      },
+    });
+
+    const linksWithCategories = publicLinks.map((link) => ({
+      ...link,
+      categories: link.linkCategories.map((lc) => lc.category),
+    }));
+
+    res.success(
+      { links: linksWithCategories, pagination: { page, limit, total, totalPages } },
+      'Public links retrieved successfully'
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /links/private - list user's private links with pagination
+router.get('/private', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId!;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+    const search = (req.query.search as string | undefined)?.trim();
+    const excludeCollectionId = req.query.excludeCollectionId as string | undefined;
+
+    let whereCondition: any = and(eq(links.userId, userId), eq(links.isPrivate, true));
+    if (search && search.length > 0) {
+      const pattern = `%${search}%`;
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(links.title, pattern),
+          ilike(links.url, pattern),
+          ilike(links.notes, pattern)
+        )
+      );
+    }
+
+    if (excludeCollectionId) {
+      const existing = await db
+        .select({ linkId: collectionLinks.linkId })
+        .from(collectionLinks)
+        .where(eq(collectionLinks.collectionId, excludeCollectionId));
+      const excludeIds = existing.map((r) => r.linkId);
+      if (excludeIds.length > 0) {
+        whereCondition = and(whereCondition, notInArray(links.id, excludeIds));
+      }
+    }
+
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(links)
+      .where(whereCondition);
+
+    const total = totalResult.count;
+    const totalPages = Math.ceil(total / limit);
+
+    const privateLinks = await db.query.links.findMany({
+      where: whereCondition,
+      orderBy: (l, { desc }) => [desc(l.createdAt)],
+      limit,
+      offset,
+      with: {
+        linkCategories: {
+          with: { category: true },
+        },
+      },
+    });
+
+    const linksWithCategories = privateLinks.map((link) => ({
+      ...link,
+      categories: link.linkCategories.map((lc) => lc.category),
+    }));
+
+    res.success(
+      { links: linksWithCategories, pagination: { page, limit, total, totalPages } },
+      'Private links retrieved successfully'
+    );
+  } catch (error) {
     next(error);
   }
 });
@@ -211,12 +371,29 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     if (Object.keys(updateData).length > 0) {
       updateData.updatedAt = new Date();
-      
+
       const [updatedLink] = await db
         .update(links)
         .set(updateData)
         .where(eq(links.id, linkId))
         .returning();
+
+      if (body.isPrivate === true) {
+        await db
+          .delete(collectionLinks)
+          .where(
+            and(
+              eq(collectionLinks.linkId, linkId),
+              inArray(
+                collectionLinks.collectionId,
+                db
+                  .select({ id: collections.id })
+                  .from(collections)
+                  .where(and(eq(collections.userId, userId), eq(collections.isPrivate, false)))
+              )
+            )
+          );
+      }
 
       res.success(updatedLink, 'Link updated successfully');
     } else {
@@ -344,6 +521,8 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
       throw new AppError(404, 'Link not found');
     }
 
+    await db.delete(linkCategories).where(eq(linkCategories.linkId, linkId));
+    await db.delete(collectionLinks).where(eq(collectionLinks.linkId, linkId));
     await db.delete(links).where(eq(links.id, linkId));
 
     res.success(null, 'Link deleted successfully');
@@ -353,4 +532,3 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
 });
 
 export default router;
-

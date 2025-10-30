@@ -12,9 +12,11 @@ import { motion } from 'framer-motion';
 interface LinkCardProps {
   link: Link;
   onEdit?: (link: Link) => void;
+  dropdownMode?: 'default' | 'collection';
+  onRemoveFromCollection?: () => void;
 }
 
-export default function LinkCard({ link, onEdit }: LinkCardProps) {
+export default function LinkCard({ link, onEdit, dropdownMode = 'default', onRemoveFromCollection }: LinkCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const toggleReadMutation = useToggleRead();
   const archiveLinkMutation = useArchiveLink();
@@ -60,33 +62,45 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
   const isChecked = link.status === 'read';
   const isArchived = link.status === 'archived';
 
-  const dropdownItems = [
-    ...(onEdit ? [{
-      label: 'Edit',
-      icon: <Edit className="h-4 w-4" />,
-      onClick: handleEdit,
-      disabled: false,
-    }] : []),
-    {
-      label: link.isFavorite ? 'Unfavorite' : 'Favorite',
-      icon: <Star className={`h-4 w-4 ${link.isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />,
-      onClick: handleToggleFavorite,
-      disabled: toggleFavoriteMutation.isPending,
-    },
-    {
-      label: isArchived ? 'Unarchive' : 'Archive',
-      icon: <Archive className="h-4 w-4" />,
-      onClick: handleArchive,
-      disabled: archiveLinkMutation.isPending,
-    },
-    {
-      label: 'Delete',
-      icon: <Trash2 className="h-4 w-4" />,
-      onClick: handleDelete,
-      variant: 'destructive' as const,
-      disabled: deleteLinkMutation.isPending,
-    },
-  ];
+  const dropdownItems = dropdownMode === 'collection'
+    ? [
+        {
+          label: 'Remove from collection',
+          icon: <Trash2 className="h-4 w-4" />,
+          onClick: onRemoveFromCollection,
+          variant: 'destructive' as const,
+          disabled: false,
+        },
+      ]
+    : [
+        ...(onEdit
+          ? [{
+              label: 'Edit',
+              icon: <Edit className="h-4 w-4" />,
+              onClick: handleEdit,
+              disabled: false,
+            }]
+          : []),
+        {
+          label: link.isFavorite ? 'Unfavorite' : 'Favorite',
+          icon: <Star className={`h-4 w-4 ${link.isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />,
+          onClick: handleToggleFavorite,
+          disabled: toggleFavoriteMutation.isPending,
+        },
+        {
+          label: isArchived ? 'Unarchive' : 'Archive',
+          icon: <Archive className="h-4 w-4" />,
+          onClick: handleArchive,
+          disabled: archiveLinkMutation.isPending,
+        },
+        {
+          label: 'Delete',
+          icon: <Trash2 className="h-4 w-4" />,
+          onClick: handleDelete,
+          variant: 'destructive' as const,
+          disabled: deleteLinkMutation.isPending,
+        },
+      ];
 
   return (
     <motion.div
@@ -98,33 +112,35 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
     <Card className="bg-muted/20 rounded-3xl transition-shadow">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
-          {!isArchived ? (
-            <button
-              onClick={handleToggleRead}
-              disabled={toggleReadMutation.isPending}
-              className="flex-shrink-0 disabled:opacity-50"
-              aria-label={isChecked ? 'Mark as unread' : 'Mark as read'}
-            >
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                isChecked 
-                  ? 'bg-green-600 border-green-600' 
-                  : 'border-gray-300 hover:border-green-600'
-              }`}>
-                {isChecked && (
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M5 13l4 4L19 7"></path>
-                  </svg>
-                )}
+          {dropdownMode !== 'collection' ? (
+            !isArchived ? (
+              <button
+                onClick={handleToggleRead}
+                disabled={toggleReadMutation.isPending}
+                className="flex-shrink-0 disabled:opacity-50"
+                aria-label={isChecked ? 'Mark as unread' : 'Mark as read'}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  isChecked 
+                    ? 'bg-green-600 border-green-600' 
+                    : 'border-gray-300 hover:border-green-600'
+                }`}>
+                  {isChecked && (
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  )}
+                </div>
+              </button>
+            ) : (
+              <div
+                className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-muted"
+                aria-hidden="true"
+              >
+                <Archive className="h-3 w-3 text-muted-foreground" />
               </div>
-            </button>
-          ) : (
-            <div
-              className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-muted"
-              aria-hidden="true"
-            >
-              <Archive className="h-3 w-3 text-muted-foreground" />
-            </div>
-          )}
+            )
+          ) : null}
           <CardTitle className="text-lg flex-1 truncate flex items-center gap-2">
             {link.title}
             {link.isFavorite && (
@@ -174,6 +190,7 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
           )}
         </div>
     </CardContent>
+    
     <ConfirmDeleteLinkModal
       isOpen={isDeleteOpen}
       onClose={() => setIsDeleteOpen(false)}

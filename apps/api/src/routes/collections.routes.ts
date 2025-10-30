@@ -187,7 +187,6 @@ router.post('/:id/links', async (req: AuthRequest, res: Response, next: NextFunc
       throw new AppError(404, 'Collection not found');
     }
 
-    // Ensure all links belong to user and are public
     const userLinks = await db.query.links.findMany({
       where: and(eq(links.userId, userId), inArray(links.id, body.linkIds)),
     });
@@ -196,12 +195,31 @@ router.post('/:id/links', async (req: AuthRequest, res: Response, next: NextFunc
       return res.error('One or more links are invalid', 400);
     }
 
-    const nonPublic = userLinks.filter((l) => l.isPrivate);
-    if (nonPublic.length > 0) {
-      return res.error('Only public links can be added to collections', 400);
+    if (!collection.isPrivate) {
+      const hasPrivate = userLinks.some((l) => l.isPrivate);
+      if (hasPrivate) {
+        return res.error('Private links cannot be added to public collections', 400);
+      }
     }
 
-    // Insert missing relations, ignoring duplicates by unique composite key constraint
+    const existingRelations = await db.query.collectionLinks.findMany({
+      where: and(
+        eq(collectionLinks.collectionId, id),
+        inArray(collectionLinks.linkId, body.linkIds)
+      ),
+      columns: { linkId: true },
+    });
+
+    if (existingRelations.length > 0) {
+      const duplicatedIds = new Set(existingRelations.map((r) => r.linkId));
+      return res.error(
+        duplicatedIds.size === 1
+          ? 'This link is already in the collection'
+          : 'One or more links are already in the collection',
+        400
+      );
+    }
+
     const values = body.linkIds.map((linkId: string) => ({ collectionId: id, linkId }));
     await db.insert(collectionLinks).values(values).onConflictDoNothing({
       target: [collectionLinks.collectionId, collectionLinks.linkId],
@@ -217,11 +235,15 @@ router.post('/:id/links', async (req: AuthRequest, res: Response, next: NextFunc
   }
 });
 
-// GET /collections/:id/links - list links in collection (owner or public)
+// GET /collections/:id/links - list links in collection (owner or public) with pagination
 router.get('/:id/links', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
     const id = req.params.id;
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
 
     const collection = await db.query.collections.findFirst({ where: eq(collections.id, id) });
     if (!collection) {
@@ -232,16 +254,27 @@ router.get('/:id/links', async (req: AuthRequest, res: Response, next: NextFunct
       throw new AppError(404, 'Collection not found');
     }
 
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(collectionLinks)
+      .where(eq(collectionLinks.collectionId, id));
+    const total = totalResult.count;
+    const totalPages = Math.ceil(total / limit);
+
     const items = await db.query.collectionLinks.findMany({
       where: eq(collectionLinks.collectionId, id),
       with: { link: true },
       orderBy: (cl, { desc }) => [desc(cl.createdAt)],
+      limit,
+      offset,
     });
 
-    // Only public links will be present by construction, but we keep this guard
     const linksList = items.map((i) => i.link).filter((l) => !l.isPrivate);
 
-    res.success({ links: linksList }, 'Collection links retrieved successfully');
+    res.success(
+      { links: linksList, pagination: { page, limit, total, totalPages } },
+      'Collection links retrieved successfully'
+    );
   } catch (error) {
     next(error);
   }
@@ -262,9 +295,15 @@ router.delete('/:id/links/:linkId', async (req: AuthRequest, res: Response, next
       throw new AppError(404, 'Collection not found');
     }
 
-    await db
-      .delete(collectionLinks)
-      .where(and(eq(collectionLinks.collectionId, id), eq(collectionLinks.linkId, linkId)));
+    const relation = await db.query.collectionLinks.findFirst({
+      where: and(eq(collectionLinks.collectionId, id), eq(collectionLinks.linkId, linkId)),
+    });
+
+    if (!relation) {
+      return res.error('Link not found in collection', 404);
+    }
+
+    await db.delete(collectionLinks).where(and(eq(collectionLinks.collectionId, id), eq(collectionLinks.linkId, linkId)));
 
     res.success(null, 'Link removed from collection');
   } catch (error) {

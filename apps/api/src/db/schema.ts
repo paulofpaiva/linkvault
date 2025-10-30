@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum, boolean, uniqueIndex } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const linkStatusEnum = pgEnum('link_status', ['unread', 'read', 'archived']);
@@ -60,12 +60,21 @@ export const collections = pgTable('collections', {
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
-export const collectionLinks = pgTable('collection_links', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  collectionId: uuid('collection_id').notNull().references(() => collections.id, { onDelete: 'cascade' }),
-  linkId: uuid('link_id').notNull().references(() => links.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const collectionLinks = pgTable(
+  'collection_links',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    collectionId: uuid('collection_id').notNull().references(() => collections.id, { onDelete: 'cascade' }),
+    linkId: uuid('link_id').notNull().references(() => links.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    collectionLinkUnique: uniqueIndex('collection_links_collectionId_linkId_unique').on(
+      t.collectionId,
+      t.linkId
+    ),
+  })
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   links: many(links),

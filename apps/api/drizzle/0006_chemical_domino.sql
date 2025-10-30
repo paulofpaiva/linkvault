@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS "collection_links_collectionId_linkId_unique" ON "collection_links" USING btree ("collection_id","link_id");

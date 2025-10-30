@@ -6,15 +6,17 @@ import CollectionCard from '@/components/collections/CollectionCard';
 import CollectionCardSkeleton from '@/components/skeletons/CollectionCardSkeleton';
 import { Folder } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ManageCollectionModal from '@/components/modals/ManageCollectionModal';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Collections() {
-  const { items, isLoading, error, isFetchingNextPage, hasNextPage, setSentinelRef, refetch } = useCollections(12);
+  const { items, isLoading, error, isFetchingNextPage, hasNextPage, setSentinelRef, refetch } = useCollections(10);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [collectionToEdit, setCollectionToEdit] = useState<CollectionWithCount | null>(null);
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -61,7 +63,12 @@ export default function Collections() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {items.map((c: CollectionWithCount) => (
-              <CollectionCard key={c.id} collection={c} onEdit={(col) => { setCollectionToEdit(col); setIsCreateOpen(true); }} />
+              <CollectionCard
+                key={c.id}
+                collection={c}
+                onClick={(id) => navigate(`/collections/${id}`)}
+                onEdit={(col) => { setCollectionToEdit(col); setIsCreateOpen(true); }}
+              />
             ))}
           </div>
           {hasNextPage && <div ref={setSentinelRef} />}

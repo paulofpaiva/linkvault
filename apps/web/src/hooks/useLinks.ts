@@ -53,6 +53,96 @@ export const useLinks = (filter: LinkFilter = 'all', limit: number = 5) => {
     setSentinelRef,
   };
 };
+
+export const useAllLinks = (limit: number = 10, search: string = '', excludeCollectionId?: string) => {
+  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, number, string, string | undefined]>({
+    queryKey: ['all-links', limit, search, excludeCollectionId],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<ApiResponse<LinksResponse>>('/links', {
+        params: { page: pageParam, limit, search: search || undefined, excludeCollectionId },
+      });
+      return response.data.data as LinksResponse;
+    },
+    getNextPageParam: (lastPage: LinksResponse) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  const data = query.data as InfiniteData<LinksResponse> | undefined;
+  const items = (data?.pages ?? []).flatMap((p) => p.links);
+
+  return {
+    items,
+    isLoading: query.isLoading,
+    isFetchingNextPage: query.isFetchingNextPage,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    error: query.error,
+    refetch: query.refetch,
+  };
+};
+
+export const usePublicLinks = (limit: number = 10, search: string = '', excludeCollectionId?: string) => {
+  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, number, string, string | undefined]>({
+    queryKey: ['public-links', limit, search, excludeCollectionId],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<ApiResponse<LinksResponse>>('/links/public', {
+        params: { page: pageParam, limit, search: search || undefined, excludeCollectionId },
+      });
+      return response.data.data as LinksResponse;
+    },
+    getNextPageParam: (lastPage: LinksResponse) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  const data = query.data as InfiniteData<LinksResponse> | undefined;
+  const items = (data?.pages ?? []).flatMap((p) => p.links);
+  return {
+    items,
+    isLoading: query.isLoading,
+    isFetchingNextPage: query.isFetchingNextPage,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    error: query.error,
+    refetch: query.refetch,
+  };
+};
+
+export const usePrivateLinks = (limit: number = 10, search: string = '') => {
+  const query = useInfiniteQuery<LinksResponse, unknown, LinksResponse, [string, number, string]>({
+    queryKey: ['private-links', limit, search],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get<ApiResponse<LinksResponse>>('/links/private', {
+        params: { page: pageParam, limit, search: search || undefined },
+      });
+      return response.data.data as LinksResponse;
+    },
+    getNextPageParam: (lastPage: LinksResponse) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  const data = query.data as InfiniteData<LinksResponse> | undefined;
+  const items = (data?.pages ?? []).flatMap((p) => p.links);
+
+  return {
+    items,
+    isLoading: query.isLoading,
+    isFetchingNextPage: query.isFetchingNextPage,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    error: query.error,
+    refetch: query.refetch,
+  };
+};
+
 function isInfiniteLinksData(
   value: unknown
 ): value is InfiniteData<LinksResponse> {
@@ -80,6 +170,9 @@ export const useCreateLink = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Link created successfully!');
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error creating link';
@@ -99,6 +192,9 @@ export const useUpdateLink = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Link updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error updating link';
@@ -123,7 +219,6 @@ export const useToggleRead = () => {
       queryClient.setQueriesData({ queryKey: ['links'] }, (old) => {
         if (!old) return old;
 
-        // handle infinite data shape
         if (isInfiniteLinksData(old)) {
           return {
             ...old,
@@ -138,7 +233,6 @@ export const useToggleRead = () => {
           };
         }
 
-        // fallback single page shape
         return {
           ...old,
           links: (old as LinksResponse).links.map((link: LinkType) =>
@@ -153,6 +247,7 @@ export const useToggleRead = () => {
     },
     onSuccess: (response) => {
       toast.success(response.message || 'Link status updated!');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any, _linkId, context) => {
       if (context?.previousData) {
@@ -165,6 +260,9 @@ export const useToggleRead = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
   });
 };
@@ -213,6 +311,7 @@ export const useArchiveLink = () => {
     },
     onSuccess: (response) => {
       toast.success(response.message || 'Link updated!');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any, _linkId, context) => {
       if (context?.previousData) {
@@ -225,6 +324,9 @@ export const useArchiveLink = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
   });
 };
@@ -275,6 +377,7 @@ export const useToggleFavorite = () => {
     },
     onSuccess: (response) => {
       toast.success(response.message || 'Link updated!');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any, _linkId, context) => {
       if (context?.previousData) {
@@ -287,6 +390,9 @@ export const useToggleFavorite = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
   });
 };
@@ -327,6 +433,7 @@ export const useDeleteLink = () => {
     },
     onSuccess: (response) => {
       toast.success(response.message || 'Link deleted!');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any, _linkId, context) => {
       if (context?.previousData) {
@@ -339,6 +446,9 @@ export const useDeleteLink = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['public-links'] });
+      queryClient.invalidateQueries({ queryKey: ['all-links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
   });
 };

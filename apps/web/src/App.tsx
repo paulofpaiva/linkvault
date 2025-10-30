@@ -11,6 +11,7 @@ import Auth from './pages/auth/Auth';
 import Links from './pages/links/Links';
 import Profile from './pages/profile/Profile';
 import Collections from './pages/collections/Collections';
+import CollectionDetail from './pages/collections/CollectionDetail';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           >
             <Route path="/links" element={<Links />} />
             <Route path="/collections" element={<Collections />} />
+            <Route path="/collections/:id" element={<CollectionDetail />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 

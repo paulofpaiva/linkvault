@@ -43,6 +43,13 @@
       "when": 1761797662187,
       "tag": "0005_absurd_praxagora",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1761802124674,
+      "tag": "0006_chemical_domino",
+      "breakpoints": true
     }
   ]
 }
