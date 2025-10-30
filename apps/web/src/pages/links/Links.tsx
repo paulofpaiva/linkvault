@@ -8,7 +8,7 @@ import LinkCard from '@/components/links/LinkCard';
 import LinkCardSkeleton from '@/components/skeletons/LinkCardSkeleton';
 import ManageLinkModal from '@/components/modals/ManageLinkModal';
 import ManageCategoriesModal from '@/components/modals/ManageCategoriesModal';
-import { Plus, FolderKanban } from 'lucide-react';
+import { Plus, Tag } from 'lucide-react';
 import type { Link } from '@linkvault/shared';
 import { linksTabs, getEmptyStateConfig } from '@/hooks/useLinksTabs';
 import type { TabValue } from '@/hooks/useLinksTabs';
@@ -52,7 +52,7 @@ export default function Links() {
             whileTap={{ scale: 0.995 }} 
             transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
               <Button variant="outline" onClick={() => setIsCategoriesModalOpen(true)} className="flex-1 sm:flex-initial">
-                <FolderKanban className="h-4 w-4 mr-2" />
+                <Tag className="h-4 w-4 mr-2" />
                 Categories
               </Button>
           </motion.div>

@@ -67,6 +67,8 @@ export const useCreateCategory = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Category created successfully!');
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error creating category';
@@ -86,6 +88,8 @@ export const useUpdateCategory = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Category updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error updating category';
@@ -143,6 +147,8 @@ export const useDeleteCategory = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
   });
 };
