@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Button } from '@/components/ui/button';
-import { FcGoogle } from 'react-icons/fc';
 import ConfirmDeleteAccountModal from '@/components/modals/ConfirmDeleteAccountModal';
 import { AlertTriangle } from 'lucide-react';
 import { useDeleteAccount } from '@/hooks/useAuth';
@@ -49,25 +48,13 @@ export default function Profile() {
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
-              {user?.avatarUrl && user.avatarUrl !== null ? (
-                <AvatarImage src={user.avatarUrl} alt={user.name} loading="lazy" referrerPolicy="no-referrer" />
-              ) : (
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-2xl">
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-2xl">
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
-              )}
-            </Avatar>
+              </Avatar>
             <div>
               <h3 className="text-xl font-semibold">{user?.name}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
-              {user?.providerId && (
-                <div className="mt-2">
-                  <Button variant="secondary" size="sm" className="gap-2" >
-                    <FcGoogle className="h-4 w-4" />
-                    Authenticated with Google
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
 

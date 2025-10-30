@@ -2,13 +2,12 @@ import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { registerSchema, loginSchema, googleLoginSchema } from '@linkvault/shared';
+import { registerSchema, loginSchema } from '@linkvault/shared';
 import { db } from '../db/index.js';
 import { users, refreshTokens, links, categories, collections, linkCategories, collectionLinks } from '../db/schema.js';
 import { eq, inArray } from 'drizzle-orm';
 import { AppError } from '../middleware/errorHandler.middleware.js';
 import { AuthRequest, requireAuth } from '../middleware/auth.middleware.js';
-import { OAuth2Client } from 'google-auth-library';
 
 const router = Router();
 
@@ -88,9 +87,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         user: {
           id: newUser.id,
           name: newUser.name,
-          email: newUser.email,
-          avatarUrl: newUser.avatarUrl ?? null,
-          providerId: newUser.providerId ?? null,
+          email: newUser.email
         },
       },
       'User created and logged in successfully'
@@ -142,9 +139,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         user: {
           id: user.id,
           name: user.name,
-          email: user.email,
-          avatarUrl: user.avatarUrl ?? null,
-          providerId: user.providerId ?? null,
+          email: user.email
         },
       },
       'Login successful'
@@ -158,107 +153,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
   }
 });
 
-// POST /auth/google
-router.post('/google', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const body = googleLoginSchema.parse(req.body);
-
-    if (!process.env.GOOGLE_CLIENT_ID) {
-      throw new Error('GOOGLE_CLIENT_ID not configured');
-    }
-
-    const client = new OAuth2Client();
-    const ticket = await client.verifyIdToken({
-      idToken: body.idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    if (!payload) {
-      throw new AppError(401, 'Invalid Google token');
-    }
-
-    const providerId = payload.sub;
-    const email = payload.email;
-    const emailVerified = payload.email_verified;
-    const name = payload.name || 'User';
-    const picture = payload.picture || null;
-
-    if (!email || !emailVerified) {
-      throw new AppError(400, 'Google account email not verified');
-    }
-
-    // Find by email (unify accounts)
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-
-    let userId: string;
-    if (existingUser) {
-      userId = existingUser.id;
-
-      // If local, unify into google; if already google, just update avatar/providerId if needed
-      await db
-        .update(users)
-        .set({
-          provider: 'google',
-          providerId: providerId ?? existingUser.providerId ?? null,
-          avatarUrl: picture ?? existingUser.avatarUrl ?? null,
-          name: existingUser.name || name,
-        })
-        .where(eq(users.id, existingUser.id));
-    } else {
-      const [created] = await db
-        .insert(users)
-        .values({
-          name,
-          email,
-          password: null,
-          provider: 'google',
-          providerId: providerId || null,
-          avatarUrl: picture,
-        })
-        .returning();
-      userId = created.id;
-    }
-
-    const { accessToken, refreshToken } = generateTokens(userId);
-
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    await db.insert(refreshTokens).values({
-      userId,
-      token: refreshToken,
-      expiresAt,
-    });
-
-    setRefreshTokenCookie(res, refreshToken);
-
-    // Fetch updated user info for response
-    const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
-
-    res.success(
-      {
-        accessToken,
-        user: {
-          id: userId,
-          name: user?.name || name,
-          email: email,
-          avatarUrl: user?.avatarUrl ?? picture ?? null,
-          providerId: user?.providerId ?? providerId ?? null,
-        },
-      },
-      'Login with Google successful'
-    );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.error(error.errors[0].message, 400);
-      return;
-    }
-    next(error);
-  }
-});
 
 // POST /auth/refresh
 router.post('/refresh', async (req: Request, res: Response, next: NextFunction) => {

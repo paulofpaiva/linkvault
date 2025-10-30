@@ -4,13 +4,11 @@ import { toast } from 'sonner';
 import api from '@/lib/axios';
 import { queryClient } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/authStore';
-import { useUiStore } from '@/stores/uiStore';
 import type { 
   LoginInput, 
   RegisterInput, 
   AuthResponse, 
   ApiResponse,
-  User,
 } from '@linkvault/shared';
 
 export const useLogin = () => {
@@ -89,59 +87,15 @@ export const useLogout = () => {
   });
 };
 
-export const useGoogleLogin = () => {
-  const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const setAuthProcessing = useUiStore((state) => state.setAuthProcessing);
-
-  return useMutation({
-    mutationFn: async (idToken: string) => {
-      setAuthProcessing(true);
-      const response = await api.post<ApiResponse<AuthResponse>>(
-        '/auth/google',
-        { idToken },
-        { skipAuthRefresh: true }
-      );
-      return response.data;
-    },
-    onSuccess: (response) => {
-      if (response.isSuccess && response.data) {
-        const data = response.data as AuthResponse;
-        const { accessToken, user } = data;
-        const u: User = user;
-        setAuth(u, accessToken);
-        navigate('/links');
-      }
-    },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error logging in with Google';
-      toast.error(message);
-    },
-    onSettled: () => {
-      setAuthProcessing(false);
-    },
-  });
-};
-
 export const useDeleteAccount = () => {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
-  const getUser = useAuthStore.getState;
 
   return useMutation({
     mutationFn: async () => {
       await api.delete('/auth/account');
     },
     onSuccess: () => {
-      const userEmail = getUser().user?.email;
-      try {
-        const gis = (window as unknown as { google?: { accounts?: { id?: { revoke?: (email: string, cb?: () => void) => void; disableAutoSelect?: () => void } } } }).google?.accounts?.id;
-        if (userEmail && gis?.revoke) {
-          gis.revoke(userEmail, () => {});
-          gis.disableAutoSelect?.();
-        }
-      } catch {}
-
       queryClient.clear();
       logout();
       toast.success('Account deleted successfully');
@@ -153,4 +107,3 @@ export const useDeleteAccount = () => {
     },
   });
 };
-
