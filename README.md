@@ -1,7 +1,7 @@
 ![linkvault Logo](./assets/linkvault.png)
 # LinkVault
 
-A simple personal link manager. Save URLs, add notes, organize by categories, and track status (unread, read, archived). Includes authentication, pagination, and automatic page title fetching.
+linkvault is a collaborative link manager that lets you save and organize links, add notes, share public collections, and explore what other users are curating.
 
 ## Tech Stack
 
