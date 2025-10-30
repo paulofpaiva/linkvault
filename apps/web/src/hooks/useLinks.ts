@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import api from '@/lib/axios';
 import type { LinksResponse, ApiResponse, CreateLinkInput, UpdateLinkInput } from '@linkvault/shared';
 
-type LinkFilter = 'all' | 'unread' | 'archived';
+type LinkFilter = 'all' | 'unread' | 'archived' | 'favorites';
 
 export const useLinks = (filter: LinkFilter = 'all', page: number = 1) => {
   return useQuery({
@@ -11,7 +11,9 @@ export const useLinks = (filter: LinkFilter = 'all', page: number = 1) => {
     queryFn: async () => {
       const params: Record<string, any> = { page, limit: 10 };
       
-      if (filter !== 'all') {
+      if (filter === 'favorites') {
+        params.favorite = true;
+      } else if (filter !== 'all') {
         params.status = filter;
       }
 
@@ -127,6 +129,50 @@ export const useArchiveLink = () => {
             link.id === linkId
               ? { ...link, status: link.status === 'archived' ? 'unread' : 'archived' }
               : link
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+    onSuccess: (response) => {
+      toast.success(response.message || 'Link updated!');
+    },
+    onError: (error: any, _linkId, context) => {
+      if (context?.previousData) {
+        context.previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      const message = error.response?.data?.message || 'Error updating link';
+      toast.error(message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+    },
+  });
+};
+
+export const useToggleFavorite = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (linkId: string) => {
+      const response = await api.patch<ApiResponse<any>>(`/links/${linkId}/favorite`);
+      return response.data;
+    },
+    onMutate: async (linkId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['links'] });
+
+      const previousData = queryClient.getQueriesData({ queryKey: ['links'] });
+
+      queryClient.setQueriesData({ queryKey: ['links'] }, (old: any) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          links: old.links.map((link: any) =>
+            link.id === linkId ? { ...link, isFavorite: !link.isFavorite } : link
           ),
         };
       });

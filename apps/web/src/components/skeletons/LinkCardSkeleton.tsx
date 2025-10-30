@@ -9,7 +9,7 @@ export default function LinkCardSkeleton({ count = 3 }: LinkCardSkeletonProps) {
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
-        <Card key={index}>
+        <Card key={index} className="bg-muted/20 rounded-3xl">
           <CardHeader>
             <Skeleton className="h-6 w-3/4" />
           </CardHeader>

@@ -18,6 +18,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
     const statusFilter = req.query.status as string | undefined;
+    const favoriteQuery = req.query.favorite as string | undefined;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
     const offset = (page - 1) * limit;
@@ -27,9 +28,15 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       parsedStatus = statusQuerySchema.parse(statusFilter);
     }
 
-    const whereCondition = parsedStatus
-      ? and(eq(links.userId, userId), eq(links.status, parsedStatus))
-      : eq(links.userId, userId);
+    const favorite = favoriteQuery === 'true' ? true : favoriteQuery === 'false' ? false : undefined;
+
+    let whereCondition: any = eq(links.userId, userId);
+    if (parsedStatus) {
+      whereCondition = and(whereCondition, eq(links.status, parsedStatus));
+    }
+    if (favorite !== undefined) {
+      whereCondition = and(whereCondition, eq(links.isFavorite, favorite));
+    }
 
     const [totalResult] = await db
       .select({ count: count() })
@@ -280,6 +287,38 @@ router.patch('/:id/archive', async (req: AuthRequest, res: Response, next: NextF
       .where(eq(links.id, linkId))
       .returning();
 
+    res.success(updatedLink, message);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH /links/:id/favorite
+router.patch('/:id/favorite', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId!;
+    const linkId = req.params.id;
+
+    const link = await db.query.links.findFirst({
+      where: and(
+        eq(links.id, linkId),
+        eq(links.userId, userId)
+      ),
+    });
+
+    if (!link) {
+      throw new AppError(404, 'Link not found');
+    }
+
+    const newValue = !link.isFavorite;
+
+    const [updatedLink] = await db
+      .update(links)
+      .set({ isFavorite: newValue, updatedAt: new Date() })
+      .where(eq(links.id, linkId))
+      .returning();
+
+    const message = newValue ? 'Link marked as favorite' : 'Link unmarked as favorite';
     res.success(updatedLink, message);
   } catch (error) {
     next(error);

@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import CategoryBadge from '@/components/categories/CategoryBadge';
-import { ExternalLink, Archive, Trash2, MoreVertical, Edit } from 'lucide-react';
+import { ExternalLink, Archive, Trash2, MoreVertical, Edit, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { useToggleRead, useArchiveLink, useDeleteLink } from '@/hooks/useLinks';
+import { useToggleRead, useArchiveLink, useDeleteLink, useToggleFavorite } from '@/hooks/useLinks';
 import type { Link } from '@linkvault/shared';
 
 interface LinkCardProps {
@@ -15,6 +15,7 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
   const toggleReadMutation = useToggleRead();
   const archiveLinkMutation = useArchiveLink();
   const deleteLinkMutation = useDeleteLink();
+  const toggleFavoriteMutation = useToggleFavorite();
 
   const formattedDate = formatDistanceToNow(new Date(link.createdAt), {
     addSuffix: true,
@@ -36,6 +37,10 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
     deleteLinkMutation.mutate(link.id);
   };
 
+  const handleToggleFavorite = () => {
+    toggleFavoriteMutation.mutate(link.id);
+  };
+
   const handleEdit = () => {
     if (onEdit) {
       onEdit(link);
@@ -53,6 +58,12 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
       disabled: false,
     }] : []),
     {
+      label: (link as any).isFavorite ? 'Unfavorite' : 'Favorite',
+      icon: <Star className={`h-4 w-4 ${(link as any).isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />,
+      onClick: handleToggleFavorite,
+      disabled: toggleFavoriteMutation.isPending,
+    },
+    {
       label: isArchived ? 'Unarchive' : 'Archive',
       icon: <Archive className="h-4 w-4" />,
       onClick: handleArchive,
@@ -68,7 +79,7 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
   ];
 
   return (
-    <Card className="bg-muted/20">
+    <Card className="bg-muted/20 rounded-3xl">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
           {!isArchived ? (
@@ -98,7 +109,12 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
               <Archive className="h-3 w-3 text-muted-foreground" />
             </div>
           )}
-          <CardTitle className="text-lg flex-1 truncate">{link.title}</CardTitle>
+          <CardTitle className="text-lg flex-1 truncate flex items-center gap-2">
+            {link.title}
+            {(link as any).isFavorite && (
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" aria-label="Favorite" />
+            )}
+          </CardTitle>
           <ResponsiveDropdown
             trigger={
               <button className="p-1 hover:bg-accent rounded flex-shrink-0">

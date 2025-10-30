@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Empty } from '@/components/ui/empty';
+import { Error as ErrorState } from '@/components/ui/error';
 import { useLinks } from '@/hooks/useLinks';
 import LinkCard from '@/components/links/LinkCard';
 import LinkCardSkeleton from '@/components/skeletons/LinkCardSkeleton';
 import ManageLinkModal from '@/components/modals/ManageLinkModal';
 import ManageCategoriesModal from '@/components/modals/ManageCategoriesModal';
-import { Link as LinkIcon, Plus, FolderKanban } from 'lucide-react';
+import { Plus, FolderKanban } from 'lucide-react';
 import type { Link } from '@linkvault/shared';
-
-type TabValue = 'all' | 'unread' | 'archived';
+import { homeTabs, getEmptyStateConfig } from '@/hooks/useHomeTabs';
+import type { TabValue } from '@/hooks/useHomeTabs';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabValue>('all');
@@ -29,33 +30,11 @@ export default function Home() {
     setLinkToEdit(null);
   };
 
-  const getEmptyState = () => {
-    switch (activeTab) {
-      case 'unread':
-        return {
-          title: "You're all caught up!",
-          description: "No unread links. You're doing great staying organized!",
-          actionLabel: "Create New Bookmark",
-          onAction: () => setIsCreateModalOpen(true),
-        };
-      case 'archived':
-        return {
-          title: "No archived links",
-          description: "Links you archive will appear here for later reference",
-          actionLabel: "View All Links",
-          onAction: () => setActiveTab('all'),
-        };
-      default:
-        return {
-          title: "No links saved yet",
-          description: "Start saving your favorite links and organize them easily",
-          actionLabel: "Create Your First Link",
-          onAction: () => setIsCreateModalOpen(true),
-        };
-    }
-  };
-
-  const emptyState = getEmptyState();
+  const emptyState = getEmptyStateConfig({
+    activeTab,
+    onCreateNewLink: () => setIsCreateModalOpen(true),
+    setAllTab: () => setActiveTab('all'),
+  });
 
   return (
     <div className="space-y-6">
@@ -80,19 +59,22 @@ export default function Home() {
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="unread">Unread</TabsTrigger>
-          <TabsTrigger value="archived">Archived</TabsTrigger>
+          {homeTabs.map((t) => (
+            <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value={activeTab} className="space-y-4 mt-6">
           {isLoading ? (
             <LinkCardSkeleton count={3} />
           ) : error ? (
-            <p className="text-destructive">Error loading links</p>
+            <ErrorState
+              title="Error loading links"
+              description="Try again in a few seconds or reload the page."
+            />
           ) : data?.links.length === 0 ? (
             <Empty
-              icon={LinkIcon}
+              icon={emptyState.icon}
               title={emptyState.title}
               description={emptyState.description}
               actionLabel={emptyState.actionLabel}

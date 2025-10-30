@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const linkStatusEnum = pgEnum('link_status', ['unread', 'read', 'archived']);
@@ -19,6 +19,7 @@ export const links = pgTable('links', {
   title: text('title').notNull(),
   notes: text('notes'),
   status: linkStatusEnum('status').notNull().default('unread'),
+  isFavorite: boolean('is_favorite').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });

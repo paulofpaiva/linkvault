@@ -10,10 +10,12 @@ import Landing from './pages/Landing';
 import Auth from './pages/auth/Auth';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -59,6 +61,7 @@ function App() {
           },
         }}
       />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

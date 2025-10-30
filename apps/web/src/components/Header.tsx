@@ -2,11 +2,13 @@ import { useAuthStore } from '@/stores/authStore';
 import { useLogout } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
   const logoutMutation = useLogout();
+  const { theme, toggleTheme } = useTheme();
 
   const getInitials = (name: string) => {
     const names = name.trim().split(' ');
@@ -17,6 +19,11 @@ export default function Header() {
   };
 
   const dropdownItems = [
+    {
+      label: theme === 'dark' ? 'Light mode' : 'Dark mode',
+      icon: theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
+      onClick: () => toggleTheme(),
+    },
     {
       label: 'Profile',
       icon: <User className="h-4 w-4" />,

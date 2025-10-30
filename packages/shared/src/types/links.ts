@@ -9,6 +9,7 @@ export interface Link {
   title: string;
   notes?: string | null;
   status: LinkStatus;
+  isFavorite: boolean;
   categories?: Category[];
   createdAt: string;
   updatedAt: string;
