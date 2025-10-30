@@ -124,7 +124,7 @@ export default function ManageCategoriesModal({ isOpen, onClose }: ManageCategor
               <p className="text-sm">Create your first category to get started</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="space-y-2 overflow-y-auto max-h-full md:max-h-96">
               {items.map((category: Category) => (
                 <div
                   key={category.id}

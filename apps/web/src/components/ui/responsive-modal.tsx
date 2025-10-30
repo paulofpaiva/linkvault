@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { useIsMobile } from "@/hooks/useIsMobile"
+import { createPortal } from "react-dom"
 
 interface ResponsiveModalProps {
   isOpen: boolean
@@ -32,9 +33,9 @@ export function ResponsiveModal({
   if (isMobile) {
     if (!isOpen) return null
     
-    return (
+    return createPortal(
       <div 
-        className="fixed inset-0 z-50 flex flex-col bg-background"
+        className="fixed inset-0 z-50 flex flex-col bg-background mt-0 mb-0"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b bg-background px-4 py-3 flex-shrink-0">
@@ -67,7 +68,8 @@ export function ResponsiveModal({
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {children}
         </div>
-      </div>
+      </div>,
+      document.body
     )
   }
 
