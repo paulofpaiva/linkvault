@@ -29,6 +29,13 @@
       "when": 1761793205006,
       "tag": "0003_woozy_karnak",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761797127101,
+      "tag": "0004_zippy_silver_samurai",
+      "breakpoints": true
     }
   ]
 }

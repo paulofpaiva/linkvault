@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import CategoryBadge from '@/components/categories/CategoryBadge';
-import { ExternalLink, Archive, Trash2, MoreVertical, Edit, Star } from 'lucide-react';
+import { ExternalLink, Archive, Trash2, MoreVertical, Edit, Star, Lock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToggleRead, useArchiveLink, useDeleteLink, useToggleFavorite } from '@/hooks/useLinks';
 import type { Link } from '@linkvault/shared';
@@ -68,8 +68,8 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
       disabled: false,
     }] : []),
     {
-      label: (link as any).isFavorite ? 'Unfavorite' : 'Favorite',
-      icon: <Star className={`h-4 w-4 ${(link as any).isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />,
+      label: link.isFavorite ? 'Unfavorite' : 'Favorite',
+      icon: <Star className={`h-4 w-4 ${link.isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />,
       onClick: handleToggleFavorite,
       disabled: toggleFavoriteMutation.isPending,
     },
@@ -127,8 +127,11 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
           )}
           <CardTitle className="text-lg flex-1 truncate flex items-center gap-2">
             {link.title}
-            {(link as any).isFavorite && (
+            {link.isFavorite && (
               <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" aria-label="Favorite" />
+            )}
+            {link.isPrivate && (
+              <Lock className="h-4 w-4 text-muted-foreground" aria-label="Private" />
             )}
           </CardTitle>
           <ResponsiveDropdown

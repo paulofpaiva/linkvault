@@ -20,6 +20,7 @@ export const links = pgTable('links', {
   notes: text('notes'),
   status: linkStatusEnum('status').notNull().default('unread'),
   isFavorite: boolean('is_favorite').notNull().default(false),
+  isPrivate: boolean('is_private').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });

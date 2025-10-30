@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useCreateLink, useUpdateLink } from '@/hooks/useLinks';
 import { useFetchLinkTitle } from '@/hooks/useFetchLinkTitle';
 import CategorySelector from '@/components/categories/CategorySelector';
@@ -37,6 +38,7 @@ export default function ManageLinkModal({ isOpen, onClose, linkToEdit }: ManageL
       title: '',
       notes: '',
       categoryIds: [],
+      isPrivate: false,
     },
   });
 
@@ -44,6 +46,7 @@ export default function ManageLinkModal({ isOpen, onClose, linkToEdit }: ManageL
   const titleValue = watch('title');
   const notesValue = watch('notes') || '';
   const categoryIds = watch('categoryIds') || [];
+  const isPrivateValue = watch('isPrivate') || false;
 
   const { fetchedTitle, isFetching } = useFetchLinkTitle(isEditMode ? '' : (urlValue || ''));
 
@@ -61,6 +64,7 @@ export default function ManageLinkModal({ isOpen, onClose, linkToEdit }: ManageL
       setValue('title', linkToEdit.title);
       setValue('notes', linkToEdit.notes || '');
       setValue('categoryIds', linkToEdit.categories?.map(c => c.id) || []);
+      setValue('isPrivate', linkToEdit.isPrivate || false);
     }
   }, [isOpen, linkToEdit, setValue]);
 
@@ -187,6 +191,23 @@ export default function ManageLinkModal({ isOpen, onClose, linkToEdit }: ManageL
           onChange={(ids) => setValue('categoryIds', ids)}
           disabled={isPending}
         />
+
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isPrivate"
+              checked={isPrivateValue}
+              onCheckedChange={(checked) => setValue('isPrivate', checked === true)}
+              disabled={isPending}
+            />
+            <Label htmlFor="isPrivate" className="text-sm font-normal cursor-pointer">
+              Private Link
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground pl-6">
+            This link is private and cannot be added to collections or shared
+          </p>
+        </div>
       </form>
     </ResponsiveModal>
   );

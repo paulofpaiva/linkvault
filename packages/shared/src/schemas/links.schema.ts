@@ -17,6 +17,7 @@ export const createLinkSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   notes: z.string().max(250, 'Notes must be 250 characters or less').optional(),
   categoryIds: z.array(z.string().uuid()).optional(),
+  isPrivate: z.boolean().optional(),
 });
 
 export const updateLinkSchema = z.object({
@@ -35,6 +36,7 @@ export const updateLinkSchema = z.object({
   title: z.string().min(1, 'Title is required').optional(),
   notes: z.string().max(250, 'Notes must be 250 characters or less').optional(),
   categoryIds: z.array(z.string().uuid()).optional(),
+  isPrivate: z.boolean().optional(),
 });
 
 export type CreateLinkInput = z.infer<typeof createLinkSchema>;

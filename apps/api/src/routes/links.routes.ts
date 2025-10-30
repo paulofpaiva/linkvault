@@ -113,6 +113,7 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
         title: body.title,
         notes: body.notes || null,
         status: 'unread',
+        isPrivate: body.isPrivate || false,
       })
       .returning();
 
@@ -206,6 +207,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     if (body.url !== undefined) updateData.url = body.url;
     if (body.title !== undefined) updateData.title = body.title;
     if (body.notes !== undefined) updateData.notes = body.notes || null;
+    if (body.isPrivate !== undefined) updateData.isPrivate = body.isPrivate;
 
     if (Object.keys(updateData).length > 0) {
       updateData.updatedAt = new Date();
