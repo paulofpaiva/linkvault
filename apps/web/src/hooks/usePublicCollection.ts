@@ -73,6 +73,15 @@ export const useClonePublicCollection = () => {
     onSuccess: (response) => {
       toast.success(response.message || 'Collection cloned successfully');
       queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['public-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['private-links'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['all-links'], exact: false });
+      const newId: string | undefined = response?.data?.id;
+      if (newId) {
+        queryClient.invalidateQueries({ queryKey: ['collection', newId] });
+        queryClient.invalidateQueries({ queryKey: ['collection-links', newId] });
+      }
     },
     onError: (error: any) => {
       const message = error?.response?.data?.message || 'Error cloning collection';
