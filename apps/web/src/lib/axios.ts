@@ -7,10 +7,12 @@ declare module 'axios' {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL !== undefined
+  ? import.meta.env.VITE_API_URL
+  : 'http://localhost:3000';
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL ? `${API_BASE_URL}/api` : '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -82,8 +84,9 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const refreshURL = API_BASE_URL ? `${API_BASE_URL}/api/auth/refresh` : '/api/auth/refresh';
         const response = await axios.post(
-          `${API_BASE_URL}/api/auth/refresh`,
+          refreshURL,
           {},
           { withCredentials: true }
         );
@@ -118,4 +121,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
