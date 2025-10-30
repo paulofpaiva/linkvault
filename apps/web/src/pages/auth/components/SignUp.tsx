@@ -1,13 +1,16 @@
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInput } from '@linkvault/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRegister } from '@/hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignUp() {
   const registerMutation = useRegister();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -68,13 +71,23 @@ export default function SignUp() {
 
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            disabled={registerMutation.isPending}
-            {...register('password')}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              disabled={registerMutation.isPending}
+              {...register('password')}
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2 top-2.5 rounded p-1 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-sm font-medium text-destructive">
               {errors.password.message}

@@ -5,26 +5,21 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import ConfirmDeleteAccountModal from '@/components/modals/ConfirmDeleteAccountModal';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Lock } from 'lucide-react';
 import { useDeleteAccount } from '@/hooks/useAuth';
+import ChangePasswordModal from '@/components/modals/ChangePasswordModal';
+import { getInitials } from '@/lib/text';
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const deleteAccountMutation = useDeleteAccount();
-
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  
   const handleConfirmDelete = () => {
     deleteAccountMutation.mutate(undefined, {
       onSettled: () => setIsDeleteOpen(false),
     });
-  };
-
-  const getInitials = (name: string) => {
-    const names = name.trim().split(' ');
-    if (names.length === 1) {
-      return names[0].substring(0, 2).toUpperCase();
-    }
-    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
   };
 
   return (
@@ -71,7 +66,15 @@ export default function Profile() {
               <label className="text-sm font-medium text-muted-foreground">Account ID</label>
               <p className="text-base font-mono text-sm">{user?.id}</p>
             </div>
-            <div>
+            <div className='flex flex-col gap-2'>
+              <Button
+                className='w-full'
+                variant="outline"
+                onClick={() => setIsChangePasswordOpen(true)}
+              >
+                <Lock className="h-4 w-4" />
+                <span>Change Password</span> 
+              </Button>
               <Button
                 className='w-full'
                 variant="destructive"
@@ -89,6 +92,10 @@ export default function Profile() {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={deleteAccountMutation.isPending}
+      />
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { registerSchema, loginSchema } from '@linkvault/shared';
+import { registerSchema, loginSchema, changePasswordSchema } from '@linkvault/shared';
 import { db } from '../db/index.js';
 import { users, refreshTokens, links, categories, collections, linkCategories, collectionLinks } from '../db/schema.js';
 import { eq, inArray } from 'drizzle-orm';
@@ -222,6 +222,46 @@ router.post('/logout', requireAuth, async (req: AuthRequest, res: Response, next
     clearRefreshTokenCookie(res);
     res.success(null, 'Logout successful');
   } catch (error) {
+    next(error);
+  }
+});
+
+// POST /auth/password
+router.post('/password', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      throw new AppError(401, 'Unauthorized');
+    }
+
+    const body = changePasswordSchema.parse(req.body);
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
+    if (!user || !user.password) {
+      throw new AppError(400, 'Password change not available for this account');
+    }
+
+    const isCurrentValid = await bcrypt.compare(body.currentPassword, user.password);
+    if (!isCurrentValid) {
+      throw new AppError(401, 'Current password is incorrect');
+    }
+
+    const newHashed = await bcrypt.hash(body.newPassword, 10);
+
+    await db
+      .update(users)
+      .set({ password: newHashed })
+      .where(eq(users.id, userId));
+
+    res.success(null, 'Password updated successfully');
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.error(error.errors[0].message, 400);
+      return;
+    }
     next(error);
   }
 });

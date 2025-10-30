@@ -9,6 +9,7 @@ import type {
   RegisterInput, 
   AuthResponse, 
   ApiResponse,
+  ChangePasswordInput,
 } from '@linkvault/shared';
 
 export const useLogin = () => {
@@ -103,6 +104,24 @@ export const useDeleteAccount = () => {
     },
     onError: (error: any) => {
       const message = error?.response?.data?.message || 'Error deleting account';
+      toast.error(message);
+    },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: async (data: ChangePasswordInput) => {
+      const response = await api.post<ApiResponse<null>>('/auth/password', data);
+      return response.data;
+    },
+    onSuccess: (response) => {
+      if (response.isSuccess) {
+        toast.success(response.message || 'Password updated successfully');
+      }
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Error updating password';
       toast.error(message);
     },
   });

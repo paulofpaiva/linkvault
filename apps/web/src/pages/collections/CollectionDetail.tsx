@@ -30,6 +30,9 @@ export default function CollectionDetail() {
           <div className="flex-1 min-w-0">
             <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
               <span className="truncate">{detail.data?.title ?? 'Collection'}</span>
+              {!isLoading && (
+                <span className="ml-1 text-2xl font-normal text-muted-foreground">({items.length})</span>
+              )}
               {detail.data?.isPrivate && (
                 <Lock className="h-6 w-6 text-muted-foreground flex-shrink-0" aria-label="Private" />
               )}
