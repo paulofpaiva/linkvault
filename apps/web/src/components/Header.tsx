@@ -45,8 +45,6 @@ export default function Header() {
           <h1 className="text-2xl font-bold">linkvault</h1>
         </div>
         <div className="flex items-center gap-4">
-          
-          
           <ResponsiveDropdown
             trigger={
               <button className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">

@@ -5,6 +5,9 @@ import { ExternalLink, Archive, Trash2, MoreVertical, Edit, Star } from 'lucide-
 import { formatDistanceToNow } from 'date-fns';
 import { useToggleRead, useArchiveLink, useDeleteLink, useToggleFavorite } from '@/hooks/useLinks';
 import type { Link } from '@linkvault/shared';
+import { useState } from 'react';
+import ConfirmDeleteLinkModal from '@/components/modals/ConfirmDeleteLinkModal';
+import { motion } from 'framer-motion';
 
 interface LinkCardProps {
   link: Link;
@@ -12,6 +15,7 @@ interface LinkCardProps {
 }
 
 export default function LinkCard({ link, onEdit }: LinkCardProps) {
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const toggleReadMutation = useToggleRead();
   const archiveLinkMutation = useArchiveLink();
   const deleteLinkMutation = useDeleteLink();
@@ -34,7 +38,13 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
   };
 
   const handleDelete = () => {
-    deleteLinkMutation.mutate(link.id);
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteLinkMutation.mutate(link.id, {
+      onSettled: () => setIsDeleteOpen(false),
+    });
   };
 
   const handleToggleFavorite = () => {
@@ -79,7 +89,13 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
   ];
 
   return (
-    <Card className="bg-muted/20 rounded-3xl">
+    <motion.div
+      initial={{ y: 0, scale: 1, boxShadow: '0 0 #0000' }}
+      whileHover={{ y: -2, scale: 1.04, }}
+      whileTap={{ scale: 0.995 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}
+    >
+    <Card className="bg-muted/20 rounded-3xl transition-shadow">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
           {!isArchived ? (
@@ -132,7 +148,7 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-muted-foreground hover:text-foreground truncate flex-1"
+            className="text-sm text-blue-500 hover:text-blue-600 truncate flex-1"
           >
             {link.url}
           </a>
@@ -154,8 +170,15 @@ export default function LinkCard({ link, onEdit }: LinkCardProps) {
             </div>
           )}
         </div>
-      </CardContent>
+    </CardContent>
+    <ConfirmDeleteLinkModal
+      isOpen={isDeleteOpen}
+      onClose={() => setIsDeleteOpen(false)}
+      onConfirm={handleConfirmDelete}
+      linkTitle={link.title}
+    />
     </Card>
+    </motion.div>
   );
 }
 

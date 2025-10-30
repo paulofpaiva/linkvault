@@ -12,6 +12,7 @@ import { Plus, FolderKanban } from 'lucide-react';
 import type { Link } from '@linkvault/shared';
 import { homeTabs, getEmptyStateConfig } from '@/hooks/useHomeTabs';
 import type { TabValue } from '@/hooks/useHomeTabs';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabValue>('all');
@@ -46,14 +47,25 @@ export default function Home() {
           </p>
         </div>
         <div className="flex gap-2 sm:flex-shrink-0">
-          <Button variant="outline" onClick={() => setIsCategoriesModalOpen(true)} className="flex-1 sm:flex-initial">
-            <FolderKanban className="h-4 w-4 mr-2" />
-            Categories
-          </Button>
-          <Button onClick={() => setIsCreateModalOpen(true)} className="flex-1 sm:flex-initial">
-            <Plus className="h-4 w-4 mr-2" />
-            New Link
-          </Button>
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.04 }} 
+            whileTap={{ scale: 0.995 }} 
+            transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}>
+              <Button variant="outline" onClick={() => setIsCategoriesModalOpen(true)} className="flex-1 sm:flex-initial">
+                <FolderKanban className="h-4 w-4 mr-2" />
+                Categories
+              </Button>
+          </motion.div>
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.04 }} 
+            whileTap={{ scale: 0.995 }} 
+            transition={{ type: 'spring', stiffness: 320, damping: 22, mass: 0.6 }}
+          >
+            <Button onClick={() => setIsCreateModalOpen(true)} className="flex-1 sm:flex-initial">
+              <Plus className="h-4 w-4 mr-2" />
+              New Link
+            </Button>
+          </motion.div>
         </div>
       </div>
 
