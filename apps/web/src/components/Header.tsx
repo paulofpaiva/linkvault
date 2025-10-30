@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import { User, LogOut, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
@@ -41,8 +42,24 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">linkvault</h1>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-ring rounded">
+            linkvault
+          </Link>
+          <nav className="hidden sm:flex items-center gap-4 text-sm">
+            <Link
+              to="/links"
+              className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+            >
+              Links
+            </Link>
+            <Link
+              to="/collections"
+              className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 py-0.5"
+            >
+              Collections
+            </Link>
+          </nav>
         </div>
         <div className="flex items-center gap-4">
           <ResponsiveDropdown

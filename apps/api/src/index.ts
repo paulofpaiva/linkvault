@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.routes.js';
 import linksRoutes from './routes/links.routes.js';
 import scraperRoutes from './routes/scraper.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
+import collectionsRoutes from './routes/collections.routes.js';
 import { rateLimiter } from './middleware/rateLimiter.middleware.js';
 import { responseWrapper } from './middleware/responseWrapper.middleware.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
@@ -53,6 +54,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/links', linksRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/collections', collectionsRoutes);
 app.use('/api/scraper', scraperRoutes);
 
 app.use('*', (req, res) => {

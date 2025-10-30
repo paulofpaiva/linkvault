@@ -10,11 +10,11 @@ import ManageLinkModal from '@/components/modals/ManageLinkModal';
 import ManageCategoriesModal from '@/components/modals/ManageCategoriesModal';
 import { Plus, FolderKanban } from 'lucide-react';
 import type { Link } from '@linkvault/shared';
-import { homeTabs, getEmptyStateConfig } from '@/hooks/useHomeTabs';
-import type { TabValue } from '@/hooks/useHomeTabs';
+import { linksTabs, getEmptyStateConfig } from '@/hooks/useLinksTabs';
+import type { TabValue } from '@/hooks/useLinksTabs';
 import { motion } from 'framer-motion';
 
-export default function Home() {
+export default function Links() {
   const [activeTab, setActiveTab] = useState<TabValue>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function Home() {
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
         <TabsList>
-          {homeTabs.map((t) => (
+          {linksTabs.map((t) => (
             <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
           ))}
         </TabsList>

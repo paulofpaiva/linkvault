@@ -11,6 +11,7 @@ const router = Router();
 
 router.use(requireAuth);
 
+// GET /categories - list user's categories
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
@@ -52,7 +53,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   }
 });
 
-// POST /categories - Criar nova categoria
+// POST /categories - create new category
 router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
@@ -88,7 +89,7 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
   }
 });
 
-// GET /categories/:id - Obter uma categoria específica
+// GET /categories/:id - get a specific category
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
@@ -102,7 +103,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
     });
 
     if (!category) {
-      return res.error('Category not found', 404);
+      throw new AppError(404, 'Category not found');
     }
 
     res.success(category, 'Category retrieved successfully');
@@ -111,7 +112,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
   }
 });
 
-// PATCH /categories/:id - Atualizar categoria
+// PATCH /categories/:id - update category
 router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
@@ -126,7 +127,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!category) {
-      return res.error('Category not found', 404);
+      throw new AppError(404, 'Category not found');
     }
 
     if (body.name) {
@@ -161,7 +162,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
   }
 });
 
-// DELETE /categories/:id - Deletar categoria
+// DELETE /categories/:id - delete category
 router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
@@ -175,7 +176,7 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!category) {
-      return res.error('Category not found', 404);
+      throw new AppError(404, 'Category not found');
     }
 
     await db

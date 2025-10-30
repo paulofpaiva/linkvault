@@ -27,7 +27,7 @@ export const useLogin = () => {
       if (response.isSuccess && response.data) {
         const { accessToken, user } = response.data;
         setAuth(user, accessToken);
-        navigate('/home');
+        navigate('/links');
       }
     },
     onError: (error: any) => {
@@ -55,7 +55,7 @@ export const useRegister = () => {
         const { accessToken, user } = response.data;
         setAuth(user, accessToken);
         toast.success(response.message || 'Account created successfully!');
-        navigate('/home');
+        navigate('/links');
       }
     },
     onError: (error: any) => {

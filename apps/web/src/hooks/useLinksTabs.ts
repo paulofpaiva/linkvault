@@ -2,7 +2,7 @@ import { Link as LinkIcon, Inbox, Star, Archive } from 'lucide-react';
 
 export type TabValue = 'all' | 'unread' | 'archived' | 'favorites';
 
-export const homeTabs: { value: TabValue; label: string }[] = [
+export const linksTabs: { value: TabValue; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'unread', label: 'Unread' },
   { value: 'archived', label: 'Archived' },

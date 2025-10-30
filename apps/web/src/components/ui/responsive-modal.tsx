@@ -74,48 +74,46 @@ export function ResponsiveModal({
   }
 
   return (
-    <div className="hidden sm:block">
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent 
-          className={`sm:max-w-[425px] ${className}`} 
-          autoFocus={false}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <DialogTitle className="sr-only">{title}</DialogTitle>
-          <DialogDescription className="sr-only">
-            {description || title}
-          </DialogDescription>
-          
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold">{title}</h2>
-            {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        className={`sm:max-w-[425px] ${className}`} 
+        autoFocus={false}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        <DialogDescription className="sr-only">
+          {description || title}
+        </DialogDescription>
+        
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          {description && (
+            <p className="text-sm text-muted-foreground">{description}</p>
+          )}
+        </div>
+
+        <div className="mb-6">
+          {children}
+        </div>
+
+        {(actionButton || onCancel) && (
+          <div className="flex gap-3 pt-4">
+            {onCancel && (
+              <Button 
+                variant="outline" 
+                onClick={onCancel}
+                className="flex-1"
+              >
+                {cancelText}
+              </Button>
+            )}
+            {actionButton && (
+              <>{actionButton}</>
             )}
           </div>
-
-          <div className="mb-6">
-            {children}
-          </div>
-
-          {(actionButton || onCancel) && (
-            <div className="flex gap-3 pt-4">
-              {onCancel && (
-                <Button 
-                  variant="outline" 
-                  onClick={onCancel}
-                  className="flex-1"
-                >
-                  {cancelText}
-                </Button>
-              )}
-              {actionButton && (
-                <>{actionButton}</>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 

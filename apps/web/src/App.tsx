@@ -8,8 +8,9 @@ import AuthLayout from './layouts/AuthLayout';
 import RootLayout from './layouts/RootLayout';
 import Landing from './pages/Landing';
 import Auth from './pages/auth/Auth';
-import Home from './pages/Home';
-import Profile from './pages/Profile';
+import Links from './pages/links/Links';
+import Profile from './pages/profile/Profile';
+import Collections from './pages/collections/Collections';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
@@ -40,7 +41,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/home" element={<Home />} />
+            <Route path="/links" element={<Links />} />
+            <Route path="/collections" element={<Collections />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 

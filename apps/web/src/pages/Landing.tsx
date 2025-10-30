@@ -9,7 +9,7 @@ export default function Landing() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home');
+      navigate('/links');
     }
   }, [isAuthenticated, navigate]);
 

@@ -41,4 +41,3 @@ export const updateLinkSchema = z.object({
 
 export type CreateLinkInput = z.infer<typeof createLinkSchema>;
 export type UpdateLinkInput = z.infer<typeof updateLinkSchema>;
-
