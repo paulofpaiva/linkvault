@@ -51,7 +51,7 @@ export default function PublicCollection() {
                       size="sm"
                       onClick={() => {
                         if (!meta?.id) return;
-                        cloneMutation.mutate(meta.id, {
+                        cloneMutation.mutate({ collectionId: meta.id }, {
                           onSuccess: (response) => {
                             const newId = response?.data?.id;
                             if (newId) {

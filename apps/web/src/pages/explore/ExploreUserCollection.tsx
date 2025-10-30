@@ -48,7 +48,7 @@ export default function ExploreUserCollection() {
             <Button
               size="sm"
               onClick={() => {
-                cloneMutation.mutate(collectionId, {
+                cloneMutation.mutate({ collectionId, exploreUserId: userId, exploreCollectionId: collectionId }, {
                   onSuccess: (response) => {
                     const newId = response?.data?.id
                     if (newId) {

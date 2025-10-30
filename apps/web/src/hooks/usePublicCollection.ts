@@ -66,11 +66,12 @@ export function usePublicCollection(id: string | undefined, limit: number = 10) 
 export const useClonePublicCollection = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (collectionId: string) => {
+    mutationFn: async (params: { collectionId: string; exploreUserId?: string; exploreCollectionId?: string }) => {
+      const { collectionId } = params;
       const response = await api.post<ApiResponse<any>>(`/public/collections/${collectionId}/clone`);
       return response.data;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       toast.success(response.message || 'Collection cloned successfully');
       queryClient.invalidateQueries({ queryKey: ['collections'] });
       queryClient.invalidateQueries({ queryKey: ['links'], exact: false });
@@ -81,6 +82,17 @@ export const useClonePublicCollection = () => {
       if (newId) {
         queryClient.invalidateQueries({ queryKey: ['collection', newId] });
         queryClient.invalidateQueries({ queryKey: ['collection-links', newId] });
+      }
+      const exploreUserId = variables?.exploreUserId;
+      const exploreCollectionId = variables?.exploreCollectionId;
+      if (exploreUserId) {
+        queryClient.invalidateQueries({ queryKey: ['explore-user', exploreUserId] });
+        queryClient.invalidateQueries({ queryKey: ['explore-user-collections', exploreUserId], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['explore-user-links', exploreUserId], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['explore-users'], exact: false });
+      }
+      if (exploreUserId && exploreCollectionId) {
+        queryClient.invalidateQueries({ queryKey: ['explore-user-collection-links', exploreUserId, exploreCollectionId], exact: false });
       }
     },
     onError: (error: any) => {
