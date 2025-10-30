@@ -1,6 +1,7 @@
-import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
+import { useInfiniteQuery, type InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import type { ApiResponse, Link } from '@linkvault/shared';
+import { toast } from 'sonner';
 
 interface PublicCollectionMeta {
   id: string;
@@ -61,5 +62,23 @@ export function usePublicCollection(id: string | undefined, limit: number = 10) 
     refetch: query.refetch,
   };
 }
+
+export const useClonePublicCollection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (collectionId: string) => {
+      const response = await api.post<ApiResponse<any>>(`/public/collections/${collectionId}/clone`);
+      return response.data;
+    },
+    onSuccess: (response) => {
+      toast.success(response.message || 'Collection cloned successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Error cloning collection';
+      toast.error(message);
+    },
+  });
+};
 
 

@@ -7,13 +7,17 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Empty } from '@/components/ui/empty';
-import { Folder } from 'lucide-react';
+import { Folder, Copy } from 'lucide-react';
 import PublicCollectionHeaderSkeleton from '@/components/skeletons/PublicCollectionHeaderSkeleton';
+import { useClonePublicCollection } from '@/hooks/usePublicCollection';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function PublicCollection() {
   const { id } = useParams<{ id: string }>();
   const { meta, owner, items, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, refetch } = usePublicCollection(id, 10);
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const cloneMutation = useClonePublicCollection();
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -42,6 +46,26 @@ export default function PublicCollection() {
                       ({meta?.linkCount ?? 0})
                     </span>
                   </h2>
+                  {isAuthenticated && (
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (!meta?.id) return;
+                        cloneMutation.mutate(meta.id, {
+                          onSuccess: (response) => {
+                            const newId = response?.data?.id;
+                            if (newId) {
+                              navigate(`/collections/${newId}`);
+                            }
+                          },
+                        });
+                      }}
+                      disabled={cloneMutation.isPending}
+                    >
+                      <Copy className="h-4 w-4 mr-2" />
+                      Clone
+                    </Button>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   by {owner?.name ?? 'Unknown'}

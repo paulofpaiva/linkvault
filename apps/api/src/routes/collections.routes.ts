@@ -355,7 +355,7 @@ router.post('/:id/clone', async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     const baseTitle = existing.title;
-    let newTitle = `${baseTitle} (Copy)`;
+    let newTitle = `${baseTitle} (Cloned)`;
 
     // Ensure unique title for the user
     const existingTitles = await db.query.collections.findMany({
@@ -365,8 +365,8 @@ router.post('/:id/clone', async (req: AuthRequest, res: Response, next: NextFunc
     const titleSet = new Set(existingTitles.map((t) => t.title));
     if (titleSet.has(newTitle)) {
       let i = 2;
-      while (titleSet.has(`${baseTitle} (Copy ${i})`)) i += 1;
-      newTitle = `${baseTitle} (Copy ${i})`;
+      while (titleSet.has(`${baseTitle} (Cloned ${i})`)) i += 1;
+      newTitle = `${baseTitle} (Cloned ${i})`;
     }
 
     const created = await db.transaction(async (tx) => {
