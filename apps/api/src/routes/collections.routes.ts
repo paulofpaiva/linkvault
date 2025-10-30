@@ -313,6 +313,32 @@ router.delete('/:id/links/:linkId', async (req: AuthRequest, res: Response, next
   }
 });
 
+// PATCH /collections/:id/toggle-privacy - toggle isPrivate
+router.patch('/:id/toggle-privacy', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId!;
+    const id = req.params.id;
+
+    const existing = await db.query.collections.findFirst({
+      where: and(eq(collections.id, id), eq(collections.userId, userId)),
+    });
+
+    if (!existing) {
+      throw new AppError(404, 'Collection not found');
+    }
+
+    const [updated] = await db
+      .update(collections)
+      .set({ isPrivate: !existing.isPrivate, updatedAt: new Date() })
+      .where(eq(collections.id, id))
+      .returning();
+
+    res.success(updated, 'Collection privacy updated');
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST /collections/:id/clone - clone collection with its links
 router.post('/:id/clone', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

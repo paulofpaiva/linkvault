@@ -1,9 +1,10 @@
-import { Folder, MoreVertical, Edit, Trash2, Lock, Copy } from 'lucide-react';
+import { Folder, MoreVertical, Edit, Trash2, Lock, Copy, Unlock } from 'lucide-react';
 import type { CollectionWithCount } from '@/types/collections';
 import { ResponsiveDropdown } from '@/components/ui/responsive-dropdown';
 import { useState } from 'react';
 import ConfirmDeleteCollectionModal from '@/components/modals/ConfirmDeleteCollectionModal';
-import { useCloneCollection, useDeleteCollection } from '@/hooks/useCollections';
+import { useCloneCollection, useDeleteCollection, useToggleCollectionPrivacy } from '@/hooks/useCollections';
+import ConfirmToggleCollectionModal from '@/components/modals/ConfirmToggleCollectionModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 
@@ -17,6 +18,8 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const deleteCollectionMutation = useDeleteCollection();
   const cloneCollectionMutation = useCloneCollection();
+  const togglePrivacyMutation = useToggleCollectionPrivacy();
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
 
   const dropdownItems = [
     {
@@ -39,6 +42,16 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
         })
       },
       disabled: cloneCollectionMutation.isPending,
+    },
+    {
+      label: collection.isPrivate ? 'Make public' : 'Make private',
+      icon: collection.isPrivate ? (
+        <Unlock className="h-4 w-4" />
+      ) : (
+        <Lock className="h-4 w-4" />
+      ),
+      onClick: () => setIsToggleOpen(true),
+      disabled: togglePrivacyMutation.isPending,
     },
     {
       label: 'Delete',
@@ -102,6 +115,18 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
         onConfirm={handleConfirmDelete}
         collectionTitle={collection.title}
         isLoading={deleteCollectionMutation.isPending}
+        linkCount={collection.linkCount}
+        color={collection.color as string}
+      />
+      <ConfirmToggleCollectionModal
+        isOpen={isToggleOpen}
+        onClose={() => setIsToggleOpen(false)}
+        onConfirm={() => togglePrivacyMutation.mutate(collection.id, { onSettled: () => setIsToggleOpen(false) })}
+        isLoading={togglePrivacyMutation.isPending}
+        nextState={collection.isPrivate ? 'public' : 'private'}
+        collectionTitle={collection.title}
+        linkCount={collection.linkCount}
+        color={collection.color as string}
       />
     </>
   );

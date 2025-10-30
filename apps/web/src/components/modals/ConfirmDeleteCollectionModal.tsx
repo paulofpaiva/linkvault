@@ -1,6 +1,7 @@
 import { ResponsiveModal } from '@/components/ui/responsive-modal'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
+import CollectionInfo from '@/components/collections/CollectionInfo'
 
 interface ConfirmDeleteCollectionModalProps {
   isOpen: boolean
@@ -8,6 +9,8 @@ interface ConfirmDeleteCollectionModalProps {
   onConfirm: () => void
   collectionTitle?: string
   isLoading: boolean
+  linkCount?: number
+  color?: string
 }
 
 export default function ConfirmDeleteCollectionModal({
@@ -16,6 +19,8 @@ export default function ConfirmDeleteCollectionModal({
   onConfirm,
   collectionTitle,
   isLoading,
+  linkCount,
+  color,
 }: ConfirmDeleteCollectionModalProps) {
   return (
     <ResponsiveModal
@@ -50,6 +55,9 @@ export default function ConfirmDeleteCollectionModal({
             </p>
           )}
         </div>
+        {collectionTitle && (
+          <CollectionInfo title={collectionTitle} linkCount={linkCount ?? 0} color={color} className="mt-2" />
+        )}
       </div>
     </ResponsiveModal>
   )

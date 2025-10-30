@@ -217,3 +217,22 @@ export const useCloneCollection = () => {
     },
   });
 };
+
+export const useToggleCollectionPrivacy = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (collectionId: string) => {
+      const response = await api.patch<ApiResponse<any>>(`/collections/${collectionId}/toggle-privacy`);
+      return response.data;
+    },
+    onSuccess: (response) => {
+      toast.success(response.message || 'Collection privacy updated');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Error updating privacy';
+      toast.error(message);
+    },
+  });
+};

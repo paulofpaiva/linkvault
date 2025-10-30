@@ -1,6 +1,7 @@
 import { ResponsiveModal } from '@/components/ui/responsive-modal'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
+import LinkInfo from '@/components/links/LinkInfo'
 
 interface ConfirmDeleteLinkModalProps {
   isOpen: boolean
@@ -50,6 +51,9 @@ export default function ConfirmDeleteLinkModal({
             </p>
           )}
         </div>
+        {linkTitle && (
+          <LinkInfo title={linkTitle} className="mt-2" />
+        )}
       </div>
     </ResponsiveModal>
   )
