@@ -17,17 +17,17 @@ export default function PublicCollection() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        {!isLoading && (
-          <div className="rounded-xl border bg-accent/30 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div className="text-sm">
-              <span className="font-medium">Preview:</span> This collection was shared with you. Create an account to save and organize your own links.
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate('/auth/sign-in')}>Sign In</Button>
-              <Button size="sm" onClick={() => navigate('/auth/sign-up')}>Sign Up</Button>
-            </div>
+      {!isLoading && (
+        <div className="rounded-xl border bg-accent/30 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="text-sm">
+            <span className="font-medium">Preview:</span> This collection was shared with you. Create an account to save and organize your own links.
           </div>
-        )}
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/auth/sign-in')}>Sign In</Button>
+            <Button size="sm" onClick={() => navigate('/auth/sign-up')}>Sign Up</Button>
+          </div>
+        </div>
+      )}
 
         {isLoading || !meta ? (
           <PublicCollectionHeaderSkeleton />
@@ -36,12 +36,12 @@ export default function PublicCollection() {
             {!meta?.isPrivate && (
               <>
                 <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <h1 className="text-3xl font-bold tracking-tight flex-1 min-w-0">
+                  <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                     <span className="block truncate">{meta?.title ?? 'Collection'}</span>
-                  </h1>
-                  <span className="text-xs px-2 py-1 rounded-full border text-muted-foreground whitespace-nowrap flex-shrink-0 mt-1 md:mt-0">
-                    {(meta?.linkCount ?? 0)} {(meta?.linkCount ?? 0) === 1 ? 'link' : 'links'}
-                  </span>
+                    <span className="ml-1 text-2xl font-normal text-muted-foreground">
+                      ({meta?.linkCount ?? 0})
+                    </span>
+                  </h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   by {owner?.name ?? 'Unknown'}
