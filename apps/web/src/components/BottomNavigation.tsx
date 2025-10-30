@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { cn } from '@/lib/utils'
-import {Folder, User, Plus, Home, Tag } from 'lucide-react'
+import {Folder, User, Plus, Home, Tag, Search } from 'lucide-react'
 import { useCreateLinkContext } from '@/contexts/CreateLinkContext'
 import { useManageCategoriesContext } from '@/contexts/ManageCategoriesContext'
 import { Fragment } from 'react'
@@ -19,6 +19,7 @@ export function BottomNavigation() {
   const items = [
     { id: 'links', label: 'Links', href: '/links', icon: Home, match: 'eq' as const },
     { id: 'collections', label: 'Collections', href: '/collections', icon: Folder, match: 'startsWith' as const },
+    { id: 'explore', label: 'Explore', href: '/explore', icon: Search, match: 'startsWith' as const },
     { id: 'profile', label: 'Profile', href: '/profile', icon: User, match: 'eq' as const },
   ]
 

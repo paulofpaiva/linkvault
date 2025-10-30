@@ -85,6 +85,12 @@ export default function Header() {
               >
                 Categories
               </button>
+              <Link
+                to="/explore"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-ring rounded px-1 py-0.5"
+              >
+                Explore
+              </Link>
             </nav>
           )}
         </div>

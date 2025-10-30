@@ -105,7 +105,7 @@ export default function CollectionCard({ collection, onClick, onEdit }: Props) {
             </div>
           </CardHeader>
           <CardContent className="space-y-2 pt-2">
-            <div className="text-xs text-muted-foreground">{collection.linkCount} links</div>
+            <div className="text-xs text-muted-foreground">{collection.linkCount} {collection.linkCount === 1 ? 'link' : 'links'}</div>
           </CardContent>
         </Card>
       </motion.div>

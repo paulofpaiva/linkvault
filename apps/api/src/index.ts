@@ -12,6 +12,7 @@ import scraperRoutes from './routes/scraper.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
 import collectionsRoutes from './routes/collections.routes.js';
 import publicCollectionsRoutes from './routes/public.collections.routes.js';
+import exploreRoutes from './routes/explore.routes.js';
 import { rateLimiter } from './middleware/rateLimiter.middleware.js';
 import { responseWrapper } from './middleware/responseWrapper.middleware.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
@@ -57,6 +58,7 @@ app.use('/api/links', linksRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/collections', collectionsRoutes);
 app.use('/api/public/collections', publicCollectionsRoutes);
+app.use('/api/explore', exploreRoutes);
 app.use('/api/scraper', scraperRoutes);
 
 app.use('*', (req, res) => {

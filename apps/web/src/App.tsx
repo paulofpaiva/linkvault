@@ -16,6 +16,9 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import PublicCollection from './pages/collections/PublicCollection';
 import PublicLayout from './layouts/PublicLayout';
 import NotFound from './pages/NotFound';
+import Explore from './pages/explore/Explore';
+import ExploreUser from './pages/explore/ExploreUser';
+import ExploreUserCollection from './pages/explore/ExploreUserCollection';
 import { ScrollToTop } from './components/ScrollToTop';
 
 function App() {
@@ -54,6 +57,9 @@ function App() {
             <Route path="/collections" element={<Collections />} />
             <Route path="/collections/:id" element={<CollectionDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/explore/user/:userId" element={<ExploreUser />} />
+            <Route path="/explore/user/:userId/collection/:collectionId" element={<ExploreUserCollection />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

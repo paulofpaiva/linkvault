@@ -20,11 +20,11 @@ export default function RootLayout() {
     <div className="min-h-screen max-w-4xl mx-auto">
       <CreateLinkProvider openCreateLink={openCreateLink}>
         <ManageCategoriesProvider openManageCategories={openManageCategories}>
-          <Header />
+      <Header />
 
-          <main className="container mx-auto px-4 py-8">
-            <Outlet />
-          </main>
+      <main className="container mx-auto px-4 py-8">
+        <Outlet />
+      </main>
 
           <BottomNavigation />
 

@@ -3,6 +3,7 @@ export * from './schemas/auth.schema.js';
 export * from './schemas/links.schema.js';
 export * from './schemas/categories.schema.js';
 export * from './schemas/collections.schema.js';
+export * from './schemas/explore.schema.js';
 
 // Types
 export * from './types/auth.js';

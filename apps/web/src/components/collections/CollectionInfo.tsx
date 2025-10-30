@@ -16,7 +16,7 @@ export default function CollectionInfo({ title, linkCount, color, className = ''
       </div>
       <div className="min-w-0">
         <div className="font-medium truncate">{title}</div>
-        <div className="text-xs text-muted-foreground">{linkCount} links</div>
+        <div className="text-xs text-muted-foreground">{linkCount} {linkCount === 1 ? 'link' : 'links'}</div>
       </div>
     </div>
   )

@@ -55,13 +55,13 @@ export default function SignIn() {
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
-            <Input
-              id="password"
+          <Input
+            id="password"
               type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              disabled={loginMutation.isPending}
-              {...register('password')}
-            />
+            placeholder="••••••••"
+            disabled={loginMutation.isPending}
+            {...register('password')}
+          />
             <button
               type="button"
               aria-label={showPassword ? 'Hide password' : 'Show password'}

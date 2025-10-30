@@ -40,7 +40,7 @@ export default function PublicCollection() {
                     <span className="block truncate">{meta?.title ?? 'Collection'}</span>
                   </h1>
                   <span className="text-xs px-2 py-1 rounded-full border text-muted-foreground whitespace-nowrap flex-shrink-0 mt-1 md:mt-0">
-                    {meta?.linkCount ?? 0} links
+                    {(meta?.linkCount ?? 0)} {(meta?.linkCount ?? 0) === 1 ? 'link' : 'links'}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
