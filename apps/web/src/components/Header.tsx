@@ -66,7 +66,7 @@ export default function Header() {
     <header className="top-0 z-40 border-b bg-background/100">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link to="/" className="text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-ring rounded">
+          <Link to="/links" className="text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-ring rounded">
             linkvault
           </Link>
           {isAuthenticated && (
