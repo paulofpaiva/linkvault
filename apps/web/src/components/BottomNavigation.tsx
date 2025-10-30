@@ -24,7 +24,7 @@ export function BottomNavigation() {
   return (
     <nav className={cn(
       'fixed bottom-0 left-0 right-0 z-40 border-t transition-all duration-300',
-      scrollDirection === 'down' ? 'bg-background/10' : 'bg-background/100'
+      scrollDirection === 'down' ? 'bg-background/10 border-none' : 'bg-background/100'
     )}>
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center justify-around px-2 py-2 gap-2">

@@ -16,12 +16,14 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import PublicCollection from './pages/collections/PublicCollection';
 import PublicLayout from './layouts/PublicLayout';
 import NotFound from './pages/NotFound';
+import { ScrollToTop } from './components/ScrollToTop';
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route element={<PublicLayout />}>
